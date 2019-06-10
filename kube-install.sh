@@ -31,6 +31,7 @@ registry_ip=$6
 
 export KUBECONFIG=`pwd`/files/admin.conf
 
+# https://docs.docker.com/registry/insecure/
 function install_registry_certs() {
     echo "$registry_ip registry.local" >> /etc/hosts
 
@@ -195,6 +196,7 @@ function install_metallb() {
     rm example-layer2-config.yaml
 }
 
+# https://docs.docker.com/registry/deploying/
 function install_registry() {
     kubectl create namespace registry
     kubectl create -n registry secret tls tls-secret --cert=files/cert.pem --key=files/key.pem
