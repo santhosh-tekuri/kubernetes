@@ -39,9 +39,11 @@ function install_registry_certs() {
         openssl req -x509 -new -keyout files/key.pem -nodes -out files/cert.pem -subj '/C=IN/ST=Karnataka/O=MGMT/CN=registry.local' -days 900000
     fi
 
+    # trust the certificate at the OS level
     cp files/cert.pem /usr/local/share/ca-certificates/registry.local.crt
     update-ca-certificates
 
+    # make docker daemon trust the certificate
     mkdir -p /etc/docker/certs.d/registry.local:443
     cp files/cert.pem /etc/docker/certs.d/registry.local:443/ca.crt
     mkdir -p /etc/docker/certs.d/registry.local
