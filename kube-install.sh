@@ -212,6 +212,7 @@ function install_registry() {
     rm files/docker-registry.yaml
 }
 
+# https://github.com/nginxinc/kubernetes-ingress/blob/master/docs/installation.md
 function install_nginx_ingress() {
     # create a namespace and a service account
     kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/deployments/common/ns-and-sa.yaml
