@@ -5,8 +5,8 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
-if [ $# -ne 6 ]; then
-    echo "usage: kube-install.sh master|worker|addons <ipaddr> <iface> <master-ip> <metallb-addresses> <registry-ip>"
+if [ $# -ne 7 ]; then
+    echo "usage: kube-install.sh master|worker|addons <ipaddr> <iface> <master-ip> <metallb-addresses> <registry-ip> <ingress-ip>"
     exit 1
 fi
 
@@ -22,32 +22,36 @@ user_home=`eval echo ~$user_name`
 # fix for: dpkg-reconfigure: unable to re-open stdin: No file or directory
 export DEBIAN_FRONTEND=noninteractive
 
-cmd=$1
-ipaddr=$2
-iface=$3
-master_ip=$4
-metallb_addresses=$5
-registry_ip=$6
+cmd=$1;shift
+ipaddr=$1;shift
+iface=$1;shift
+master_ip=$1;shift
+metallb_addresses=$1;shift
+registry_ip=$1;shift
+ingress_ip=$1;shift
 
 export KUBECONFIG=`pwd`/files/admin.conf
 
 # https://docs.docker.com/registry/insecure/
 function install_registry_certs() {
     echo "$registry_ip registry.local" >> /etc/hosts
+    echo "$ingress_ip ingress.local" >> /etc/hosts
 
     if [ "$cmd" = "master" ]; then
-        openssl req -x509 -new -keyout files/key.pem -nodes -out files/cert.pem -subj '/C=IN/ST=Karnataka/O=MGMT/CN=registry.local' -days 900000
+        openssl req -x509 -new -keyout files/registry-key.pem -nodes -out files/registry-cert.pem -subj '/C=IN/ST=Karnataka/O=MGMT/CN=registry.local' -days 900000
+        openssl req -x509 -new -keyout files/ingress-key.pem -nodes -out files/ingress-cert.pem -subj '/C=IN/ST=Karnataka/O=MGMT/CN=ingress.local' -days 900000
     fi
 
     # trust the certificate at the OS level
-    cp files/cert.pem /usr/local/share/ca-certificates/registry.local.crt
+    cp files/registry-cert.pem /usr/local/share/ca-certificates/registry.local.crt
+    cp files/ingress-cert.pem /usr/local/share/ca-certificates/ingress.local.crt
     update-ca-certificates
 
     # make docker daemon trust the certificate
     mkdir -p /etc/docker/certs.d/registry.local:443
-    cp files/cert.pem /etc/docker/certs.d/registry.local:443/ca.crt
+    cp files/registry-cert.pem /etc/docker/certs.d/registry.local:443/ca.crt
     mkdir -p /etc/docker/certs.d/registry.local
-    cp files/cert.pem /etc/docker/certs.d/registry.local/ca.crt
+    cp files/registry-cert.pem /etc/docker/certs.d/registry.local/ca.crt
 }
 
 # https://kubernetes.io/docs/setup/cri/#docker
@@ -201,11 +205,34 @@ function install_metallb() {
 # https://docs.docker.com/registry/deploying/
 function install_registry() {
     kubectl create namespace registry
-    kubectl create -n registry secret tls tls-secret --cert=files/cert.pem --key=files/key.pem
+    kubectl create -n registry secret tls tls-secret --cert=files/registry-cert.pem --key=files/registry-key.pem
 
     sed  "s/loadBalancerIP:.*/loadBalancerIP: $registry_ip/g" docker-registry.yaml > files/docker-registry.yaml
     kubectl create -n registry -f files/docker-registry.yaml
     rm files/docker-registry.yaml
+}
+
+function install_nginx_ingress() {
+    # create a namespace and a service account
+    kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/deployments/common/ns-and-sa.yaml
+
+    # create a secret with a TLS certificate and a key for the default server
+    kubectl create -n nginx-ingress secret tls default-server-secret --cert=files/ingress-cert.pem --key=files/ingress-key.pem
+    # kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/deployments/common/default-server-secret.yaml
+
+    # create a config map for customizing NGINX configuration
+    kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/deployments/common/nginx-config.yaml
+
+    # configure rbac
+    kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/deployments/rbac/rbac.yaml
+
+    # deploy Ingress controller using deployment resource
+    kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/deployments/deployment/nginx-ingress.yaml
+
+    curl -sO https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/deployments/service/loadbalancer.yaml
+    sed -i "s/type: LoadBalancer/type: LoadBalancer\n  loadBalancerIP: $ingress_ip/g" loadbalancer.yaml
+    kubectl apply -f loadbalancer.yaml
+    rm loadbalancer.yaml
 }
 
 if [ "$cmd" = "master" ]; then
@@ -227,6 +254,7 @@ elif [ "$cmd" = "addons" ]; then
     install_nfs_provisioner
     install_metallb
     install_registry
+    install_nginx_ingress
 else
     echo "invalid command $1"
     exit 1
