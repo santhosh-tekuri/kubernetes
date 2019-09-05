@@ -78,7 +78,8 @@ function install_docker() {
       "exec-opts": ["native.cgroupdriver=systemd"],
       "log-driver": "json-file",
       "log-opts": {
-        "max-size": "100m"
+        "max-size": "5m",
+        "max-file": "3"
       },
       "storage-driver": "overlay2"
     }
