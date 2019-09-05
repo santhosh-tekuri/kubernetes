@@ -73,16 +73,16 @@ function install_docker() {
     apt-get update && apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 18.06.2 | head -1 | awk '{print $3}')
 
     # Setup daemon.
-    cat > /etc/docker/daemon.json <<EOF
-    {
-      "exec-opts": ["native.cgroupdriver=systemd"],
-      "log-driver": "json-file",
-      "log-opts": {
-        "max-size": "5m",
-        "max-file": "3"
-      },
-      "storage-driver": "overlay2"
-    }
+    cat <<EOF > /etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "5m",
+    "max-file": "3"
+  },
+  "storage-driver": "overlay2"
+}
 EOF
     mkdir -p /etc/systemd/system/docker.service.d
 
