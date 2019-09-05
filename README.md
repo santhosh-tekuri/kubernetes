@@ -10,7 +10,7 @@ the cluster includes:
 - `kubectl` is configured on all nodes with bash auto-completion
 - dynamic nfs client provisioner
     - nfs server is run in master node
-    - /kubedata folder is the nfs share
+    - `/kubedata` folder on master node is the nfs share
 - metallb loadbalancer
 - local docker registry server at `registry.local` address
 - nginx ingress provisioner
