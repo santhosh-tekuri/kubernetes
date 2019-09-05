@@ -54,7 +54,7 @@ function install_registry_certs() {
     cp files/registry-cert.pem /etc/docker/certs.d/registry.local/ca.crt
 }
 
-# https://kubernetes.io/docs/setup/cri/#docker
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
 function install_docker() {
     # Install packages to allow apt to use a repository over HTTPS
     apt-get update
@@ -93,7 +93,7 @@ EOF
     usermod -a -G docker $user_name
 }
 
-# https://kubernetes.io/docs/setup/independent/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
 function install_kubeadm() {
     apt-get update && apt-get install -y apt-transport-https
     curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
@@ -101,7 +101,7 @@ function install_kubeadm() {
     deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
     apt-get update
-    version=1.14
+    version=1.15
     apt-get install -y kubelet=$(apt-cache madison kubelet | grep $version | head -1 | awk '{print $3}')
     apt-get install -y kubectl=$(apt-cache madison kubectl | grep $version | head -1 | awk '{print $3}')
     apt-get install -y kubeadm=$(apt-cache madison kubeadm | grep $version | head -1 | awk '{print $3}')
@@ -113,7 +113,7 @@ EOF
     fi
 }
 
-# https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/#24-initializing-your-master
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#instructions
 function init_cluster() {
     kubeadm init --apiserver-advertise-address=$ipaddr --pod-network-cidr=10.244.0.0/16
     kubeadm token create --print-join-command > files/kubeadm-join.sh
@@ -126,8 +126,11 @@ function setup_kube_config() {
     sudo chown -R `id -u $user_name`:`id -g $user_name` $user_home/.kube
 }
 
-# https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/#pod-network
-function install_pod_network() {    
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
+function install_pod_network() {
+    # pass bridged IPv4 traffic to iptables’ chains
+    sysctl net.bridge.bridge-nf-call-iptables=1
+
     curl -O -s https://raw.githubusercontent.com/coreos/flannel/62e44c867a2846fefb68bd5f178daf4da3095ccb/Documentation/kube-flannel.yml
 
     # note: we have to add --iface=enp0s8 to get flannel working in vagrant
