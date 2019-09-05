@@ -13,7 +13,7 @@ the cluster includes:
     - `/kubedata` folder on master node is the nfs share
 - metallb loadbalancer
 - local docker registry server at `registry.local` address
-- nginx ingress provisioner
+- nginx ingress at `ingress.local` address
 
 
 
