@@ -126,6 +126,7 @@ function setup_kube_config() {
     cp files/admin.conf $user_home/.kube/config
     sudo chown -R `id -u $user_name`:`id -g $user_name` $user_home/.kube
     echo 'source <(kubectl completion bash)' >> $user_home/.bashrc
+    echo "export LANG='en_US.UTF-8'" >> $user_home/.bashrc
 }
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
