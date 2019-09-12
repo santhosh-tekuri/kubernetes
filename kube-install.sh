@@ -117,8 +117,8 @@ EOF
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#instructions
 function init_cluster() {
     kubeadm init --apiserver-advertise-address=$ipaddr --pod-network-cidr=10.244.0.0/16
-    kubeadm token create --print-join-command > files/kubeadm-join.sh
     cp /etc/kubernetes/admin.conf files
+    kubeadm token create --print-join-command > files/kubeadm-join.sh
 }
 
 function setup_kube_config() {
