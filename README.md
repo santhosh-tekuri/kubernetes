@@ -14,6 +14,7 @@ the cluster includes:
 - metallb loadbalancer
 - local docker registry server at `registry.local` address
 - nginx ingress at `ingress.local` address
+- [metrics-server](https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/)
 
 
 

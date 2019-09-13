@@ -242,6 +242,20 @@ function install_nginx_ingress() {
     rm loadbalancer.yaml
 }
 
+# https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/
+function install_metrics_server() {
+    rm -rf ./metrics-server
+    git clone https://github.com/kubernetes-incubator/metrics-server.git
+    cat <<EOF >> ./metrics-server/deploy/1.8+/metrics-server-deployment.yaml
+        command:
+        - /metrics-server
+        - --kubelet-insecure-tls
+        - --kubelet-preferred-address-types=InternalIP
+EOF
+    kubectl create -f ./metrics-server/deploy/1.8+/
+    rm -rf ./metrics-server
+}
+
 if [ "$cmd" = "master" ]; then
     install_registry_certs
     install_docker
@@ -262,6 +276,7 @@ elif [ "$cmd" = "addons" ]; then
     install_metallb
     install_registry
     install_nginx_ingress
+    install_metrics_server
 else
     echo "invalid command $1"
     exit 1
