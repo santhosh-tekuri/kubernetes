@@ -11,6 +11,7 @@ the cluster includes:
 - dynamic [nfs client provisioner](https://github.com/kubernetes-incubator/external-storage/tree/master/nfs-client)
     - nfs server is run in master node
     - `/kubedata` folder on master node is the nfs share
+    - storage class is marked as default
 - [metallb](https://metallb.universe.tf/) loadbalancer
 - local [docker registry server](https://docs.docker.com/registry/deploying/) at `registry.local` address
 - [nginx ingress](https://github.com/nginxinc/kubernetes-ingress) at `ingress.local` address
