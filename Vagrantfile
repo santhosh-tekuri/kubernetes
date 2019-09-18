@@ -26,7 +26,7 @@ Vagrant.configure("2") do |config|
     master.vm.network "private_network", ip: master_ip
     master.vm.provision "shell" do |s|
       s.inline = "/usr/bin/env bash /vagrant/kube-install.sh $*"
-      s.args = ["master", master_ip, iface, master_ip, metallb_addresses, registry_ip, ingress_ip]
+      s.args = ["master", iface, metallb_addresses, registry_ip, ingress_ip]
     end
   end
 
@@ -36,12 +36,12 @@ Vagrant.configure("2") do |config|
       node.vm.network "private_network", ip: worker_ip.(i)
       node.vm.provision "shell" do |s|
         s.inline = "/usr/bin/env bash /vagrant/kube-install.sh $*"
-        s.args = ["worker", worker_ip.(i), iface, master_ip, metallb_addresses, registry_ip, ingress_ip]
+        s.args = ["worker", iface, metallb_addresses, registry_ip, ingress_ip]
       end
       if i == workers
         node.vm.provision "shell" do |s|
           s.inline = "/usr/bin/env bash /vagrant/kube-install.sh $*"
-          s.args = ["addons", worker_ip.(i), iface, master_ip, metallb_addresses, registry_ip, ingress_ip]
+          s.args = ["addons", iface, metallb_addresses, registry_ip, ingress_ip]
         end
       end
     end

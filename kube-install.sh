@@ -5,8 +5,8 @@ if [ $(id -u) -ne 0 ]; then
     exit 1
 fi
 
-if [ $# -ne 7 ]; then
-    echo "usage: kube-install.sh master|worker|addons <ipaddr> <iface> <master-ip> <metallb-addresses> <registry-ip> <ingress-ip>"
+if [ $# -ne 5 ]; then
+    echo "usage: kube-install.sh master|worker|addons <iface> <metallb-addresses> <registry-ip> <ingress-ip>"
     exit 1
 fi
 
@@ -23,13 +23,12 @@ user_home=`eval echo ~$user_name`
 export DEBIAN_FRONTEND=noninteractive
 
 cmd=$1;shift
-ipaddr=$1;shift
 iface=$1;shift
-master_ip=$1;shift
 metallb_addresses=$1;shift
 registry_ip=$1;shift
 ingress_ip=$1;shift
 
+ipaddr=$(ip -4 -o addr show ${iface} | awk '{print $4}' | cut -d "/" -f 1)
 export KUBECONFIG=`pwd`/files/admin.conf
 
 # https://docs.docker.com/registry/insecure/
@@ -178,6 +177,7 @@ function install_nfs_provisioner() {
     kubectl create -f https://raw.githubusercontent.com/kubernetes-incubator/external-storage/master/nfs-client/deploy/class.yaml
 
     curl -sO https://raw.githubusercontent.com/kubernetes-incubator/external-storage/master/nfs-client/deploy/deployment.yaml
+    master_ip=$(cat files/master-ip)
     sed -i s/10.10.10.60/$master_ip/g deployment.yaml
     sed -i s:/ifs/kubernetes:/kubedata:g deployment.yaml
     sed -i '0,/---$/d' deployment.yaml # remove service-account duplicate defintion
@@ -245,7 +245,7 @@ function install_nginx_ingress() {
 # https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/
 function install_metrics_server() {
     rm -rf ./metrics-server
-    git clone https://github.com/kubernetes-incubator/metrics-server.git
+    git clone --quiet https://github.com/kubernetes-incubator/metrics-server.git
     cat <<EOF >> ./metrics-server/deploy/1.8+/metrics-server-deployment.yaml
         command:
         - /metrics-server
@@ -257,6 +257,7 @@ EOF
 }
 
 if [ "$cmd" = "master" ]; then
+    echo -n $ipaddr > files/master-ip
     install_registry_certs
     install_docker
     install_kubeadm
