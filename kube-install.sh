@@ -198,11 +198,11 @@ function install_nfs_provisioner() {
 }
 
 
-# see https://metallb.universe.tf/tutorial/layer2/
+# see https://metallb.universe.tf/configuration/#layer-2-configuration
 function install_metallb() {
-    kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.7.3/manifests/metallb.yaml
+    kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/metallb.yaml
 
-    curl -sO https://raw.githubusercontent.com/google/metallb/v0.7.3/manifests/example-layer2-config.yaml
+    curl -sO https://raw.githubusercontent.com/google/metallb/v0.8.1/manifests/example-layer2-config.yaml
     sed -i "s:192.168.1.240/28:$metallb_addresses:g" example-layer2-config.yaml
     kubectl apply -f example-layer2-config.yaml
     rm example-layer2-config.yaml
