@@ -2,6 +2,11 @@
 
 kubernetes 1.15 multinode cluster using vagrant
 
+there are two types of setups available:
+- using virtualbox machines: do `ln -s Vagrantfile.vbox Vagrantfile`
+- using lxd containers: do `ln -s Vagrantfile.lxd Vagrantfile`
+
+
 the cluster includes:
 - one master and 2 worker nodes
   - you can edit `workers` in `Vagrantfile` 
