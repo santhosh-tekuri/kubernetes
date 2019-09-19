@@ -1,4 +1,4 @@
-# this vagrant files setups kubernetes 1.14 cluster
+# this vagrant files setups kubernetes cluster
 
 # in addition to master, how many worker nodes needed in cluster
 workers=2
