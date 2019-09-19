@@ -16,8 +16,7 @@ cd `dirname $0`
 mkdir -p files
 
 # get login user and home
-user_name=`logname`
-user_home=`eval echo ~$user_name`
+user_name=`logname` || user_name="$USER"
 
 # fix for: dpkg-reconfigure: unable to re-open stdin: No file or directory
 export DEBIAN_FRONTEND=noninteractive
@@ -115,12 +114,14 @@ EOF
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#instructions
 function init_cluster() {
-    kubeadm init --apiserver-advertise-address=$ipaddr --pod-network-cidr=10.244.0.0/16
+    kubeadm init $ignore_preflight_errors --apiserver-advertise-address=$ipaddr --pod-network-cidr=10.244.0.0/16
     cp /etc/kubernetes/admin.conf files
-    kubeadm token create --print-join-command > files/kubeadm-join.sh
+    joinCommand=$(kubeadm token create --print-join-command)
+    echo "$joinCommand $ignore_preflight_errors" > files/kubeadm-join.sh
 }
 
 function setup_kube_config() {
+    user_home=`eval echo ~$user_name`
     mkdir -p $user_home/.kube
     cp files/admin.conf $user_home/.kube/config
     sudo chown -R `id -u $user_name`:`id -g $user_name` $user_home/.kube
@@ -131,7 +132,7 @@ function setup_kube_config() {
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
 function install_pod_network() {
     # pass bridged IPv4 traffic to iptables’ chains
-    sysctl net.bridge.bridge-nf-call-iptables=1
+    sysctl net.bridge.bridge-nf-call-iptables=1 || true
 
     curl -O -s https://raw.githubusercontent.com/coreos/flannel/62e44c867a2846fefb68bd5f178daf4da3095ccb/Documentation/kube-flannel.yml
 
