@@ -31,7 +31,14 @@ lxc profile set k8s security.nesting true
 
 # configure metallb address range
 subnet=$(lxc network get lxdbr0 ipv4.address | cut -d "/" -f 1 | cut -d "." -f 1-3)
+
+# exclude metallb address pool from dhcp pool
 lxc network set lxdbr0 ipv4.dhcp.ranges ${subnet}.2-${subnet}.199
+
+# resolve lxd container hostnames from host machine
+echo DNS=${subnet}.1 >> /etc/systemd/resolved.conf
+echo Domains=lxd >> /etc/systemd/resolved.conf
+systemctl restart systemd-resolved
 
 iface=eth0
 metallb_addresses="${subnet}.200-${subnet}.250"
