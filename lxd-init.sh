@@ -36,6 +36,7 @@ subnet=$(lxc network get lxdbr0 ipv4.address | cut -d "/" -f 1 | cut -d "." -f 1
 lxc network set lxdbr0 ipv4.dhcp.ranges ${subnet}.2-${subnet}.199
 
 # resolve lxd container hostnames from host machine
+lxc network set lxdbr0 raw.dnsmasq $'auth-zone=lxd\ndns-loop-detect'
 echo DNS=${subnet}.1 >> /etc/systemd/resolved.conf
 echo Domains=lxd >> /etc/systemd/resolved.conf
 systemctl restart systemd-resolved
