@@ -36,10 +36,10 @@ subnet=$(lxc network get lxdbr0 ipv4.address | cut -d "/" -f 1 | cut -d "." -f 1
 lxc network set lxdbr0 ipv4.dhcp.ranges ${subnet}.2-${subnet}.199
 
 # resolve lxd container hostnames from host machine
-lxc network set lxdbr0 raw.dnsmasq $'auth-zone=lxd\ndns-loop-detect'
-echo DNS=${subnet}.1 >> /etc/systemd/resolved.conf
-echo Domains=lxd >> /etc/systemd/resolved.conf
-systemctl restart systemd-resolved
+#lxc network set lxdbr0 raw.dnsmasq $'auth-zone=lxd\ndns-loop-detect'
+#echo DNS=${subnet}.1 >> /etc/systemd/resolved.conf
+#echo Domains=lxd >> /etc/systemd/resolved.conf
+#systemctl restart systemd-resolved
 
 iface=eth0
 metallb_addresses="${subnet}.200-${subnet}.250"
@@ -47,6 +47,8 @@ registry_ip="${subnet}.250"
 ingress_ip="${subnet}.249"
 
 lxc launch $image master --profile k8s
+ipaddr=$(lxc exec master -- ip -4 -o addr show ${iface} | awk '{print $4}' | cut -d "/" -f 1)
+echo $ipaddr master.lxd >> /etc/hosts
 lxc config device add master vagrant disk source=/vagrant path=/vagrant
 sleep 5 # wait for network ready
 lxc exec master -- /vagrant/kube-install.lxd master $iface $metallb_addresses $registry_ip $ingress_ip
@@ -65,6 +67,8 @@ mv ./kubectl /usr/local/bin/kubectl
 
 for i in $(seq $workers); do
     lxc launch $image worker$i --profile k8s
+    ipaddr=$(lxc exec worker${i} -- ip -4 -o addr show ${iface} | awk '{print $4}' | cut -d "/" -f 1)
+    echo $ipaddr worker${i}.lxd >> /etc/hosts
     lxc config device add worker$i vagrant disk source=/vagrant path=/vagrant
     sleep 10 # wait for network ready
     lxc exec worker$i -- /vagrant/kube-install.lxd worker $iface $metallb_addresses $registry_ip $ingress_ip
