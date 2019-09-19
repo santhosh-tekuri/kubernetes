@@ -125,6 +125,7 @@ function setup_kube_config() {
     mkdir -p $user_home/.kube
     cp files/admin.conf $user_home/.kube/config
     sudo chown -R `id -u $user_name`:`id -g $user_name` $user_home/.kube
+    type _init_completion || echo 'source /usr/share/bash-completion/bash_completion' >> $user_home/.bashrc
     echo 'source <(kubectl completion bash)' >> $user_home/.bashrc
     echo "export LANG='en_US.UTF-8'" >> $user_home/.bashrc
 }
