@@ -1,0 +1,24 @@
+# this vagrant files setups kubernetes cluster
+
+# in addition to master, how many worker nodes needed in cluster
+workers=2
+
+subnet="172.28.129"
+master_ip="#{subnet}.10"
+
+Vagrant.configure("2") do |config|
+  config.vm.provider "virtualbox" do |vb|
+    vb.memory = 8192
+    vb.cpus = 4
+  end  
+  config.vm.box = "ubuntu/bionic64"
+
+  config.vm.define "k8s", primary: true do |k8s|
+    k8s.vm.hostname = "k8s"
+    k8s.vm.network "private_network", ip: master_ip
+    k8s.vm.provision "shell" do |s|
+      s.inline = "/usr/bin/env bash /vagrant/lxd-init.sh $*"
+      s.args = [workers]
+    end
+  end
+end
