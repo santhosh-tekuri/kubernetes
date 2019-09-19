@@ -15,7 +15,8 @@ image=ubuntu:18.04
 set -ex
 
 modprobe br_netfilter
-gpasswd -a $(logname) lxd
+user_name=$(logname)
+gpasswd -a $user_name lxd
 lxd init --auto
 
 # create k8s profile
@@ -45,10 +46,14 @@ lxc exec master -- /vagrant/kube-install.lxd master $iface $metallb_addresses $r
 # setup kubectl
 user_home=`eval echo ~$user_name`
 mkdir -p $user_home/.kube
-cp files/admin.conf $user_home/.kube/config
+cp /vagrant/files/admin.conf $user_home/.kube/config
 sudo chown -R `id -u $user_name`:`id -g $user_name` $user_home/.kube
 echo 'source <(kubectl completion bash)' >> $user_home/.bashrc
 echo "export LANG='en_US.UTF-8'" >> $user_home/.bashrc
+curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+mv ./kubectl /usr/local/bin/kubectl
+
 
 for i in $(seq $workers); do
     lxc launch $image worker$i --profile k8s
