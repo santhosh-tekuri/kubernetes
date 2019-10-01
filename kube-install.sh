@@ -34,6 +34,10 @@ export KUBECONFIG=`pwd`/files/admin.conf
 function install_registry_certs() {
     echo "$registry_ip registry.local" >> /etc/hosts
     echo "$ingress_ip ingress.local" >> /etc/hosts
+    if [ -f /etc/cloud/templates/hosts.debian.tmpl ]; then
+        echo "$registry_ip registry.local" >> /etc/cloud/templates/hosts.debian.tmpl
+        echo "$ingress_ip ingress.local" >> /etc/cloud/templates/hosts.debian.tmpl
+    fi
 
     if [ "$cmd" = "master" ]; then
         openssl req -x509 -new -keyout files/registry-key.pem -nodes -out files/registry-cert.pem -subj '/C=IN/ST=Karnataka/O=MGMT/CN=registry.local' -days 900000
