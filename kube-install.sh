@@ -108,6 +108,7 @@ EOF
     apt-get install -y kubelet=$(apt-cache madison kubelet | grep $version | head -1 | awk '{print $3}')
     apt-get install -y kubectl=$(apt-cache madison kubectl | grep $version | head -1 | awk '{print $3}')
     apt-get install -y kubeadm=$(apt-cache madison kubeadm | grep $version | head -1 | awk '{print $3}')
+    apt-mark hold kubelet kubeadm kubectl
 
     if [ -f "/etc/default/kubelet" ]; then
         sed -i "s/^KUBELET_EXTRA_ARGS=/KUBELET_EXTRA_ARGS=--node-ip=$ipaddr/" /etc/default/kubelet
