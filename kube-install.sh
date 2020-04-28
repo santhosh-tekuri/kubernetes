@@ -60,7 +60,7 @@ function install_registry_certs() {
 function install_docker() {
     # Install packages to allow apt to use a repository over HTTPS
     apt-get update
-    apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+    apt-get install -y apt-transport-https ca-certificates curl software-properties-common gnupg2
 
     # Add Docker’s official GPG key
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
@@ -72,7 +72,10 @@ function install_docker() {
        stable"
 
     # Install Docker CE
-    apt-get update && apt-get install -y docker-ce=$(apt-cache madison docker-ce | grep 18.06.2 | head -1 | awk '{print $3}')
+    apt-get update && apt-get install -y \
+      containerd.io=1.2.13-1 \
+      docker-ce=5:19.03.8~3-0~ubuntu-$(lsb_release -cs) \
+      docker-ce-cli=5:19.03.8~3-0~ubuntu-$(lsb_release -cs)
 
     # Setup daemon.
     cat <<EOF > /etc/docker/daemon.json
@@ -98,13 +101,13 @@ EOF
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
 function install_kubeadm() {
-    apt-get update && apt-get install -y apt-transport-https
+    apt-get update && apt-get install -y apt-transport-https curl
     curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
     cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
     deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
     apt-get update
-    version=1.15
+    version=1.18
     apt-get install -y kubelet=$(apt-cache madison kubelet | grep $version | head -1 | awk '{print $3}')
     apt-get install -y kubectl=$(apt-cache madison kubectl | grep $version | head -1 | awk '{print $3}')
     apt-get install -y kubeadm=$(apt-cache madison kubeadm | grep $version | head -1 | awk '{print $3}')
@@ -140,7 +143,7 @@ function install_pod_network() {
     # pass bridged IPv4 traffic to iptables’ chains
     sysctl net.bridge.bridge-nf-call-iptables=1 || true
 
-    curl -O -s https://raw.githubusercontent.com/coreos/flannel/62e44c867a2846fefb68bd5f178daf4da3095ccb/Documentation/kube-flannel.yml
+    curl -O -s https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
     # note: we have to add --iface=enp0s8 to get flannel working in vagrant
     # see https://coreos.com/flannel/docs/latest/running.html#running-on-vagrant
