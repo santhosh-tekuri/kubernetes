@@ -176,18 +176,22 @@ function install_nfs_client() {
 function install_nfs_provisioner() {
     kubectl create namespace nfs-provisioner
 
-    curl -sO https://raw.githubusercontent.com/kubernetes-incubator/external-storage/master/nfs-client/deploy/rbac.yaml
+    url=https://raw.githubusercontent.com/kubernetes-incubator/external-storage/master/nfs-client/deploy
+    curl -sO $url/rbac.yaml
     sed -i'' "s/namespace:.*/namespace: nfs-provisioner/g" rbac.yaml
     kubectl create -n nfs-provisioner -f rbac.yaml
     rm rbac.yaml
 
-    kubectl create -f https://raw.githubusercontent.com/kubernetes-incubator/external-storage/master/nfs-client/deploy/class.yaml
+    curl -sO $url/class.yaml
+    sed -i'' "s/namespace:.*/namespace: nfs-provisioner/g" class.yaml
+    kubectl create -n nfs-provisioner -f class.yaml
+    rm class.yaml
 
-    curl -sO https://raw.githubusercontent.com/kubernetes-incubator/external-storage/master/nfs-client/deploy/deployment.yaml
+    curl -sO $url/deployment.yaml
+    sed -i'' "s/namespace:.*/namespace: nfs-provisioner/g" deployment.yaml
     master_ip=$(cat files/master-ip)
     sed -i s/10.10.10.60/$master_ip/g deployment.yaml
     sed -i s:/ifs/kubernetes:/kubedata:g deployment.yaml
-    sed -i '0,/---$/d' deployment.yaml # remove service-account duplicate defintion
     kubectl create -n nfs-provisioner -f deployment.yaml
     rm deployment.yaml
 
@@ -251,16 +255,10 @@ function install_nginx_ingress() {
 
 # https://kubernetes.io/docs/tasks/debug-application-cluster/resource-metrics-pipeline/
 function install_metrics_server() {
-    rm -rf ./metrics-server
-    git clone --quiet https://github.com/kubernetes-incubator/metrics-server.git
-    cat <<EOF >> ./metrics-server/deploy/1.8+/metrics-server-deployment.yaml
-        command:
-        - /metrics-server
-        - --kubelet-insecure-tls
-        - --kubelet-preferred-address-types=InternalIP
-EOF
-    kubectl create -f ./metrics-server/deploy/1.8+/
-    rm -rf ./metrics-server
+    curl -sOL https://github.com/kubernetes-sigs/metrics-server/releases/download/v0.3.6/components.yaml
+    sed -i "s/args:/args:\n          - --kubelet-insecure-tls\n          - --kubelet-preferred-address-types=InternalIP/" components.yaml
+    kubectl create -f components.yaml
+    rm components.yaml
 }
 
 if [ "$cmd" = "master" ]; then
