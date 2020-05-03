@@ -1,0 +1,7 @@
+configMapGenerator:
+- name: zk-config
+  files:
+  - zoo.cfg
+resources: 
+  - statefulset.yaml
+  - service.yaml
