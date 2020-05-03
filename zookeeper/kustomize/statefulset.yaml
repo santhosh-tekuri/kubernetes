@@ -71,8 +71,8 @@ spec:
         env:
         - name: REPLICAS
           value: "3"
-        - name: JVM_FLAGS
-          value: -Xmx1G -Xms1G
+        - name: ZK_SERVER_HEAP
+          value: "1024"
         volumeMounts:
         - name: config
           mountPath: /config
