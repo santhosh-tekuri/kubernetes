@@ -39,6 +39,18 @@ spec:
       labels:
         app: zk
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: "app"
+                  operator: In
+                  values:
+                  - zk
+              topologyKey: "kubernetes.io/hostname"
       volumes:
       - name: config
         configMap:
