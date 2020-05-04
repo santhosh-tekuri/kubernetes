@@ -34,6 +34,7 @@ spec:
       app: zk
   serviceName: zk-headless
   replicas: 3
+  podManagementPolicy: Parallel
   template:
     metadata:
       labels:
