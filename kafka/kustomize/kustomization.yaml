@@ -1,0 +1,7 @@
+configMapGenerator:
+- name: kafka-config
+  files:
+  - server.properties
+resources: 
+  - statefulset.yaml
+  - service.yaml
