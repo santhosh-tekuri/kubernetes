@@ -11,6 +11,6 @@ RUN apt-get update \
     && apt-get autoremove -y wget
 WORKDIR $ZK_HOME
 EXPOSE 2181 2888 3888 7000
-COPY zkOk.sh docker-entrypoint.sh /apache-zookeeper-3.6.1-bin/bin/
+COPY zkOk.sh docker-entrypoint.sh $ZK_HOME/bin/
 ENTRYPOINT ["/apache-zookeeper-3.6.1-bin/bin/docker-entrypoint.sh"]
 CMD ["/apache-zookeeper-3.6.1-bin/bin/zkServer.sh", "start-foreground"]

@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -e
 
 cd /apache-zookeeper-3.6.1-bin
 
-cp /config/zoo.cfg /apache-zookeeper-3.6.1-bin/conf/zoo.cfg
+cp /config/zoo.cfg conf/zoo.cfg
 
 HOST=$(hostname -s)
 DOMAIN=$(hostname -d)
