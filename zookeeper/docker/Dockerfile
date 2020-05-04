@@ -4,7 +4,7 @@ ENV JAVA_HOME /usr/local/openjdk-11
 ENV ZK_HOME /apache-zookeeper-3.6.1-bin
 RUN apt-get update \
     && apt-get install -y wget netcat \
-    && wget http://archive.apache.org/dist/zookeeper/zookeeper-3.6.1/apache-zookeeper-3.6.1-bin.tar.gz \
+    && wget -q http://archive.apache.org/dist/zookeeper/zookeeper-3.6.1/apache-zookeeper-3.6.1-bin.tar.gz \
     && tar -xzf apache-zookeeper-3.6.1-bin.tar.gz \
     && rm apache-zookeeper-3.6.1-bin.tar.gz \
     && rm -rf $ZK_HOME/docs \
