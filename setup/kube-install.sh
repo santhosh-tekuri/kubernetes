@@ -281,6 +281,8 @@ elif [ "$cmd" = "worker" ]; then
     setup_kube_config
     install_nfs_client
 elif [ "$cmd" = "addons" ]; then
+    # allow scheduling of pods on master
+    kubectl taint node master node-role.kubernetes.io/master-
     install_nfs_provisioner
     install_metallb
     install_registry
