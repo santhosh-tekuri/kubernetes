@@ -5,6 +5,7 @@ metadata:
   labels:
     app: zk
 spec:
+  publishNotReadyAddresses: true
   selector:
     app: zk
   clusterIP: None
@@ -81,7 +82,7 @@ spec:
           mountPath: /config
         - name: datadir
           mountPath: /data
-        livenessProbe:
+        readinessProbe:
           exec:
             command: [ "/apache-zookeeper-3.6.1-bin/bin/zkOk.sh" ]
           initialDelaySeconds: 10

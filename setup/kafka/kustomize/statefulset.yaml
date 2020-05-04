@@ -5,6 +5,7 @@ metadata:
   labels:
     app: kafka
 spec:
+  publishNotReadyAddresses: true
   selector:
     app: kafka
   clusterIP: None
@@ -78,7 +79,7 @@ spec:
           mountPath: /config
         - name: datadir
           mountPath: /data
-        livenessProbe:
+        readinessProbe:
           exec:
             command: [ "/kafka_2.12-2.5.0/bin/kafka-broker-api-versions.sh", "--bootstrap-server=localhost:9092" ]
           initialDelaySeconds: 10
