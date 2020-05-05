@@ -42,7 +42,7 @@ spec:
         app: zk
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/path: "/metrics"
+        prometheus.io/path: /metrics
         prometheus.io/port: "7000"
     spec:
       affinity:
@@ -54,7 +54,7 @@ spec:
                 operator: In
                 values:
                 - zk
-            topologyKey: "kubernetes.io/hostname"
+            topologyKey: kubernetes.io/hostname
       volumes:
       - name: config
         configMap:
