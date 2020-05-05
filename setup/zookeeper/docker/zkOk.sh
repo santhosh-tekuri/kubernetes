@@ -4,6 +4,8 @@
 # is health. The $? variable will be set to 0 if server responds that it is 
 # healthy, or 1 if the server fails to respond.
 
+set -e
+
 OK=$(echo ruok | nc 127.0.0.1 2181)
 if [ "$OK" == "imok" ]; then
     exit 0
