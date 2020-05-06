@@ -1,6 +1,5 @@
 FROM openjdk:11-jre-slim
 MAINTAINER santhosh.tekuri@gmail.com
-ENV JAVA_HOME /usr/local/openjdk-11
 RUN set -eux \
     && apt-get update \
     && apt-get install -y wget \
@@ -10,7 +9,9 @@ RUN set -eux \
     && rm kafka_2.12-2.5.0.tgz \
     && rm -rf /kafka/site-docs /kafka/bin/windows \
     && apt-get autoremove -y wget
+ENV JAVA_HOME=/usr/local/openjdk-11 \
+    PATH=$PATH:/kafka/bin
 WORKDIR /kafka
 COPY docker-entrypoint.sh /kafka/bin/
 ENTRYPOINT ["/kafka/bin/docker-entrypoint.sh"]
-CMD ["/kafka/bin/kafka-server-start.sh", "config/server.properties"]
+CMD ["kafka-server-start.sh", "config/server.properties"]
