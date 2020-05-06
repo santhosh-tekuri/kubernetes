@@ -80,7 +80,7 @@ spec:
           value: "1024"
         volumeMounts:
         - name: config
-          mountPath: /config
+          mountPath: /configtmp
         - name: datadir
           mountPath: /zookeeper/data
         readinessProbe:

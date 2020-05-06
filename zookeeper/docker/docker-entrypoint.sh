@@ -4,7 +4,7 @@ set -e
 
 cd /zookeeper
 
-cp /config/zoo.cfg conf/zoo.cfg
+cp /configtmp/zoo.cfg conf/zoo.cfg
 
 HOST=$(hostname -s)
 DOMAIN=$(hostname -d)
