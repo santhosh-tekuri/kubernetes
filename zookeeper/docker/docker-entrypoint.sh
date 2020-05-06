@@ -24,8 +24,8 @@ if [[ ! -f "conf/zoo.cfg.dynamic" ]]; then
     } > conf/zoo.cfg.dynamic
 fi
 
-if [[ ! -f "/data/myid" ]]; then
-    echo $((ORD+1)) > /data/myid
+if [[ ! -f "data/myid" ]]; then
+    echo $((ORD+1)) > data/myid
 fi
 
 exec "$@"
