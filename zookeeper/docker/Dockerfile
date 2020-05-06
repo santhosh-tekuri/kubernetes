@@ -1,6 +1,7 @@
 FROM openjdk:11-jre-slim
 MAINTAINER santhosh.tekuri@gmail.com
-RUN groupadd -r zookeeper --gid=1000 \
+RUN set -eux \
+    && groupadd -r zookeeper --gid=1000 \
     && useradd -r -g zookeeper --uid=1000 zookeeper \
     && apt-get update \
     && apt-get install -y wget netcat \
