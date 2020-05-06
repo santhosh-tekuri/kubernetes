@@ -16,6 +16,6 @@ ENV JAVA_HOME=/usr/local/openjdk-11 \
     PATH=$PATH:/kafka/bin
 USER kafka
 WORKDIR /kafka
-COPY docker-entrypoint.sh /kafka/bin/
+COPY --chown=kafka:kafka docker-entrypoint.sh /kafka/bin/
 ENTRYPOINT ["/kafka/bin/docker-entrypoint.sh"]
 CMD ["kafka-server-start.sh", "config/server.properties"]
