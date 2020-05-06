@@ -45,6 +45,10 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: "7000"
     spec:
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
       terminationGracePeriodSeconds: 180
       affinity:
         podAntiAffinity:
