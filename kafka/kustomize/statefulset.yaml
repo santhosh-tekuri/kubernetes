@@ -79,7 +79,7 @@ spec:
           mountPath: /data
         readinessProbe:
           exec:
-            command: [ "/kafka_2.12-2.5.0/bin/kafka-broker-api-versions.sh", "--bootstrap-server=localhost:9092" ]
+            command: [ "/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server=localhost:9092" ]
           initialDelaySeconds: 10
           timeoutSeconds: 5
   volumeClaimTemplates:

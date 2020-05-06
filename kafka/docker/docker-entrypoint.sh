@@ -2,7 +2,7 @@
 
 set -e
 
-cd /kafka_2.12-2.5.0
+cd /kafka
 
 cp /config/server.properties config/server.properties
 
