@@ -2,7 +2,7 @@
 
 set -e
 
-cd /apache-zookeeper-3.6.1-bin
+cd /zookeeper
 
 cp /config/zoo.cfg conf/zoo.cfg
 

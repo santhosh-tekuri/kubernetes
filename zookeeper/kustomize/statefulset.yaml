@@ -85,7 +85,7 @@ spec:
           mountPath: /data
         readinessProbe:
           exec:
-            command: [ "/apache-zookeeper-3.6.1-bin/bin/zkOk.sh" ]
+            command: [ "/zookeeper/bin/zkOk.sh" ]
           initialDelaySeconds: 10
           timeoutSeconds: 5
   volumeClaimTemplates:
