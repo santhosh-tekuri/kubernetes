@@ -74,7 +74,7 @@ spec:
           value: -Xmx512M -Xms512M
         volumeMounts:
         - name: config
-          mountPath: /config
+          mountPath: /configtmp
         - name: datadir
           mountPath: /data
         readinessProbe:

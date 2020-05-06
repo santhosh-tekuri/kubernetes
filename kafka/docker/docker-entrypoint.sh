@@ -4,7 +4,7 @@ set -e
 
 cd /kafka
 
-cp /config/server.properties config/server.properties
+cp /configtmp/server.properties config/server.properties
 
 HOST=$(hostname -s)
 DOMAIN=$(hostname -d)
