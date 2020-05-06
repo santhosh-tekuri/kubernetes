@@ -45,7 +45,7 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: "7000"
     spec:
-      terminationGracePeriodSeconds: 1800
+      terminationGracePeriodSeconds: 180
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -80,7 +80,8 @@ spec:
           value: "1024"
         volumeMounts:
         - name: config
-          mountPath: /configtmp
+          mountPath: /zookeeper/conf/zoo.cfg
+          subPath: zoo.cfg
         - name: datadir
           mountPath: /zookeeper/data
         readinessProbe:

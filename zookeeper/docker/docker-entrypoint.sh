@@ -4,8 +4,6 @@ set -e
 
 cd /zookeeper
 
-cp /configtmp/zoo.cfg conf/zoo.cfg
-
 HOST=$(hostname -s)
 DOMAIN=$(hostname -d)
 if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
