@@ -28,6 +28,9 @@ spec:
   podManagementPolicy: Parallel
   template:
     spec:
+      securityContext:
+        fsGroup: 1000
+        runAsUser: 1000
       terminationGracePeriodSeconds: 120
       affinity:
         podAntiAffinity:
@@ -72,6 +75,10 @@ spec:
         volumeMounts:
           - name: datadir
             mountPath: /usr/share/elasticsearch/data
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 2Gi
         readinessProbe:
           exec:
             command:
