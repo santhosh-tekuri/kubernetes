@@ -45,6 +45,7 @@ spec:
         prometheus.io/path: /metrics
         prometheus.io/port: "7000"
     spec:
+      terminationGracePeriodSeconds: 1800
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

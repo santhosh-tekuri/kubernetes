@@ -39,6 +39,7 @@ spec:
       labels:
         app: kafka
     spec:
+       terminationGracePeriodSeconds: 120
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

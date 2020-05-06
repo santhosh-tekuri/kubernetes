@@ -28,6 +28,7 @@ spec:
   podManagementPolicy: Parallel
   template:
     spec:
+      terminationGracePeriodSeconds: 120
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
