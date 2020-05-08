@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-exporter
+  labels:
+    app: kafka
+    component: metrics
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka
+      component: metrics
+  template:
+    metadata:
+      labels:
+        app: kafka
+        component: metrics
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9308"
+    spec:
+      containers:
+      - name: metrics-exporter
+        image: danielqsj/kafka-exporter:v1.2.0
+        ports:
+        - name: http
+          containerPort: 9308
