@@ -1,0 +1,11 @@
+namespace: default
+configMapGenerator:
+- name: prometheus-server
+  files:
+  - prometheus.yml
+- name: prometheus-blackbox-exporter
+  files:
+  - blackbox.yml
+resources:
+  - server.yaml
+  - blackbox-exporter.yaml
