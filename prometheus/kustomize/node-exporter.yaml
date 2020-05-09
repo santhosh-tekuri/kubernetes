@@ -1,12 +1,4 @@
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: prometheus-node-exporter
-  labels:
-    app: prometheus
-    component: node-exporter
----
-apiVersion: v1
 kind: Service
 metadata:
   name: prometheus-node-exporter
@@ -45,7 +37,6 @@ spec:
         app: prometheus
         component: node-exporter
     spec:
-      serviceAccountName: prometheus-node-exporter
       hostNetwork: true
       hostPID: true
       volumes:
