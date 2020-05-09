@@ -9,3 +9,4 @@ configMapGenerator:
 resources:
   - server.yaml
   - blackbox-exporter.yaml
+  - node-exporter.yaml
