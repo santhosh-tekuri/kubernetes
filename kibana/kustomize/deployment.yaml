@@ -2,19 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: kibana
-  labels:
-    app: kibana
 spec:
   replicas: 1
   strategy:
     type: Recreate
-  selector:
-    matchLabels:
-      app: kibana
   template:
     metadata:
-      labels:
-        app: kibana
     spec:
       securityContext:
         fsGroup: 1000
@@ -31,38 +24,36 @@ spec:
         - name: http
           containerPort: 5601
         env:
-          - name: ELASTICSEARCH_HOSTS
-            value: http://es:9200
-          - name: SERVER_HOST
-            value: "0.0.0.0"
-          - name: NODE_OPTIONS
-            value: --max-old-space-size=1800
+        - name: ELASTICSEARCH_HOSTS
+          value: http://es:9200
+        - name: SERVER_HOST
+          value: "0.0.0.0"
+        - name: NODE_OPTIONS
+          value: --max-old-space-size=1800
         readinessProbe:
           initialDelaySeconds: 10
           successThreshold: 3
           timeoutSeconds: 5
           exec:
             command:
-              - sh
-              - -c
-              - |
-                #!/usr/bin/env bash
-                set -e
-                http () {
-                    local path="${1}"
-                    set -- -XGET -s --fail -L
+            - bash
+            - -c
+            - |
+              set -e
+              http() {
+                  local path="${1}"
+                  set -- -XGET -s --fail -L
 
-                    if [ -n "${ELASTICSEARCH_USERNAME}" ] && [ -n "${ELASTICSEARCH_PASSWORD}" ]; then
-                      set -- "$@" -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}"
-                    fi
+                  if [ -n "${ELASTICSEARCH_USERNAME}" ] && [ -n "${ELASTICSEARCH_PASSWORD}" ]; then
+                    set -- "$@" -u "${ELASTICSEARCH_USERNAME}:${ELASTICSEARCH_PASSWORD}"
+                  fi
 
-                    STATUS=$(curl --output /dev/null --write-out "%{http_code}" -k "$@" "http://localhost:5601${path}")
-                    if [[ "${STATUS}" -eq 200 ]]; then
-                      exit 0
-                    fi
+                  STATUS=$(curl --output /dev/null --write-out "%{http_code}" -k "$@" "http://localhost:5601${path}")
+                  if [[ "${STATUS}" -eq 200 ]]; then
+                    exit 0
+                  fi
 
-                    echo "Error: Got HTTP code ${STATUS} but expected a 200"
-                    exit 1
-                }
-
-                http "/app/kibana"
+                  echo "Error: Got HTTP code ${STATUS} but expected a 200"
+                  exit 1
+              }
+              http "/app/kibana"

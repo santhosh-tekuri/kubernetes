@@ -26,6 +26,14 @@ spec:
   serviceName: es-headless
   replicas: 3
   podManagementPolicy: Parallel
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
   template:
     spec:
       securityContext:
@@ -80,6 +88,9 @@ spec:
             cpu: 1000m
             memory: 2Gi
         readinessProbe:
+          initialDelaySeconds: 10
+          successThreshold: 3
+          timeoutSeconds: 5
           exec:
             command:
             - bash
@@ -122,14 +133,3 @@ spec:
                   exit 1
                 fi
               fi
-          initialDelaySeconds: 10
-          successThreshold: 3
-          timeoutSeconds: 5
-  volumeClaimTemplates:
-  - metadata:
-      name: datadir
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi
