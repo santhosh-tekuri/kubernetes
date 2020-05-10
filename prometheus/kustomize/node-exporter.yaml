@@ -4,14 +4,13 @@ metadata:
   name: prometheus-node-exporter
   labels:
     app: prometheus
-    component: node-exporter
+    comp: node-exporter
   annotations:
     prometheus.io/scrape: "true"
 spec:
   selector:
     app: prometheus
-    component: "node-exporter"
-  type: "ClusterIP"
+    comp: node-exporter
   clusterIP: None
   ports:
     - name: metrics
@@ -23,19 +22,19 @@ metadata:
   name: prometheus-node-exporter
   labels:
     app: prometheus
-    component: node-exporter
+    comp: node-exporter
 spec:
   selector:
     matchLabels:
       app: prometheus
-      component: node-exporter
+      comp: node-exporter
   updateStrategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
         app: prometheus
-        component: node-exporter
+        comp: node-exporter
     spec:
       hostNetwork: true
       hostPID: true

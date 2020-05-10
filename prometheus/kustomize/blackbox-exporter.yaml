@@ -4,11 +4,11 @@ metadata:
   name: prometheus-blackbox-exporter
   labels:
     app: promotheus
-    component: blackbox-exporter
+    comp: blackbox-exporter
 spec:
   selector:
     app: promotheus
-    component: blackbox-exporter
+    comp: blackbox-exporter
   ports:
     - name: http
       port: 9115
@@ -19,13 +19,13 @@ metadata:
   name: prometheus-blackbox-exporter
   labels:
     app: promotheus
-    component: blackbox-exporter
+    comp: blackbox-exporter
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: promotheus
-      component: blackbox-exporter
+      comp: blackbox-exporter
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -35,7 +35,7 @@ spec:
     metadata:
       labels:
         app: promotheus
-        component: blackbox-exporter
+        comp: blackbox-exporter
     spec:
       restartPolicy: Always
       volumes:

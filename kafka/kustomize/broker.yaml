@@ -4,11 +4,11 @@ metadata:
   name: kafka
   labels:
     app: kafka
-    component: broker
+    comp: broker
 spec:
   selector:
     app: kafka
-    component: broker
+    comp: broker
   ports:
   - name: server
     port: 9092
@@ -19,12 +19,12 @@ metadata:
   name: kafka-headless
   labels:
     app: kafka
-    component: broker
+    comp: broker
 spec:
   publishNotReadyAddresses: true
   selector:
     app: kafka
-    component: broker
+    comp: broker
   clusterIP: None
   ports:
   - name: server
@@ -36,7 +36,7 @@ metadata:
   name: kafka-pdb
   labels:
     app: kafka
-    component: broker
+    comp: broker
 spec:
   selector:
     matchLabels:
@@ -49,12 +49,12 @@ metadata:
   name: kafka
   labels:
     app: kafka
-    component: broker
+    comp: broker
 spec:
   selector:
     matchLabels:
       app: kafka
-      component: broker
+      comp: broker
   serviceName: kafka-headless
   replicas: 3
   podManagementPolicy: Parallel
@@ -62,7 +62,7 @@ spec:
     metadata:
       labels:
         app: kafka
-        component: broker
+        comp: broker
     spec:
       securityContext:
         runAsUser: 1000
@@ -75,7 +75,7 @@ spec:
           - labelSelector:
               matchLabels:
                 app: kafka
-                component: broker
+                comp: broker
             topologyKey: kubernetes.io/hostname
         podAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
