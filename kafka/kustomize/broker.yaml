@@ -51,6 +51,16 @@ spec:
   serviceName: kafka-headless
   replicas: 3
   podManagementPolicy: Parallel
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+      labels:
+        comp: broker
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
   template:
     metadata:
       labels:
@@ -103,13 +113,3 @@ spec:
             command: [ "kafka-broker-api-versions.sh", "--bootstrap-server=localhost:9092" ]
           initialDelaySeconds: 10
           timeoutSeconds: 5
-  volumeClaimTemplates:
-  - metadata:
-      name: datadir
-      labels:
-        comp: broker
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi

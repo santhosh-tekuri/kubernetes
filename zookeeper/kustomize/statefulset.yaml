@@ -28,6 +28,14 @@ spec:
   serviceName: zk-headless
   replicas: 3
   podManagementPolicy: Parallel
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
   template:
     metadata:
       annotations:
@@ -78,11 +86,3 @@ spec:
             command: [ "zkOk.sh" ]
           initialDelaySeconds: 10
           timeoutSeconds: 5
-  volumeClaimTemplates:
-  - metadata:
-      name: datadir
-    spec:
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi
