@@ -1,3 +1,5 @@
+commonLabels:
+  app: zk
 configMapGenerator:
 - name: zk-config
   files:

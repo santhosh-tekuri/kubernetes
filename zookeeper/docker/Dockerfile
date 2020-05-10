@@ -18,5 +18,5 @@ USER zookeeper
 WORKDIR /zookeeper
 EXPOSE 2181 2888 3888 7000
 COPY --chown=zookeeper:zookeeper zkOk.sh docker-entrypoint.sh /zookeeper/bin/
-ENTRYPOINT ["/zookeeper/bin/docker-entrypoint.sh"]
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["zkServer.sh", "start-foreground"]
