@@ -3,18 +3,15 @@ kind: Deployment
 metadata:
   name: kafka-exporter
   labels:
-    app: kafka
     comp: metrics
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: kafka
       comp: metrics
   template:
     metadata:
       labels:
-        app: kafka
         comp: metrics
       annotations:
         prometheus.io/scrape: "true"

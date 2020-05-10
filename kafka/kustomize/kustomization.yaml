@@ -1,3 +1,5 @@
+commonLabels:
+  app: kafka
 configMapGenerator:
 - name: kafka-config
   files:

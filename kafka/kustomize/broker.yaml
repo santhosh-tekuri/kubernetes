@@ -3,11 +3,9 @@ kind: Service
 metadata:
   name: kafka
   labels:
-    app: kafka
     comp: broker
 spec:
   selector:
-    app: kafka
     comp: broker
   ports:
   - name: server
@@ -18,14 +16,12 @@ kind: Service
 metadata:
   name: kafka-headless
   labels:
-    app: kafka
     comp: broker
 spec:
   publishNotReadyAddresses: true
-  selector:
-    app: kafka
-    comp: broker
   clusterIP: None
+  selector:
+    comp: broker
   ports:
   - name: server
     port: 9092
@@ -35,12 +31,11 @@ kind: PodDisruptionBudget
 metadata:
   name: kafka-pdb
   labels:
-    app: kafka
     comp: broker
 spec:
   selector:
     matchLabels:
-      app: kafka
+      comp: broker
   minAvailable: 2
 ---
 apiVersion: apps/v1
@@ -48,12 +43,10 @@ kind: StatefulSet
 metadata:
   name: kafka
   labels:
-    app: kafka
     comp: broker
 spec:
   selector:
     matchLabels:
-      app: kafka
       comp: broker
   serviceName: kafka-headless
   replicas: 3
@@ -61,7 +54,6 @@ spec:
   template:
     metadata:
       labels:
-        app: kafka
         comp: broker
     spec:
       securityContext:
@@ -74,7 +66,6 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
               matchLabels:
-                app: kafka
                 comp: broker
             topologyKey: kubernetes.io/hostname
         podAffinity:
@@ -93,7 +84,7 @@ spec:
         configMap:
           name: kafka-config
       containers:
-      - name: kafka
+      - name: broker
         imagePullPolicy: Always
         image: registry.local/santhoshkt/kafka:2.5.0
         ports:
@@ -109,12 +100,14 @@ spec:
           mountPath: /data
         readinessProbe:
           exec:
-            command: [ "/kafka/bin/kafka-broker-api-versions.sh", "--bootstrap-server=localhost:9092" ]
+            command: [ "kafka-broker-api-versions.sh", "--bootstrap-server=localhost:9092" ]
           initialDelaySeconds: 10
           timeoutSeconds: 5
   volumeClaimTemplates:
   - metadata:
       name: datadir
+      labels:
+        comp: broker
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
