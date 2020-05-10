@@ -5,11 +5,11 @@ RUN set -eux \
     && useradd -r -g zookeeper --uid=1000 zookeeper \
     && apt-get update \
     && apt-get install -y wget netcat \
-    && wget -q http://archive.apache.org/dist/zookeeper/zookeeper-3.6.1/apache-zookeeper-3.6.1-bin.tar.gz \
+    && wget -q -O zookeeper.tar.gz http://archive.apache.org/dist/zookeeper/zookeeper-3.6.1/apache-zookeeper-3.6.1-bin.tar.gz \
     && mkdir /zookeeper \
-    && tar -xzf apache-zookeeper-3.6.1-bin.tar.gz -C /zookeeper --strip-components=1 \
+    && tar -xzf zookeeper.tar.gz -C /zookeeper --strip-components=1 \
     && chown -R zookeeper:zookeeper /zookeeper \
-    && rm apache-zookeeper-3.6.1-bin.tar.gz \
+    && rm zookeeper.tar.gz \
     && rm -rf /zookeeper/bin/*.cmd /zookeeper/docs \
     && apt-get autoremove -y wget
 ENV JAVA_HOME=/usr/local/openjdk-11 \
