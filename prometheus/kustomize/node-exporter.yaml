@@ -3,13 +3,11 @@ kind: Service
 metadata:
   name: prometheus-node-exporter
   labels:
-    app: prometheus
     comp: node-exporter
   annotations:
     prometheus.io/scrape: "true"
 spec:
   selector:
-    app: prometheus
     comp: node-exporter
   clusterIP: None
   ports:
@@ -21,19 +19,16 @@ kind: DaemonSet
 metadata:
   name: prometheus-node-exporter
   labels:
-    app: prometheus
     comp: node-exporter
 spec:
   selector:
     matchLabels:
-      app: prometheus
       comp: node-exporter
   updateStrategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-        app: prometheus
         comp: node-exporter
     spec:
       hostNetwork: true

@@ -1,4 +1,6 @@
 namespace: kube-system
+commonLabels:
+  app: prometheus
 configMapGenerator:
 - name: prometheus-server
   files:

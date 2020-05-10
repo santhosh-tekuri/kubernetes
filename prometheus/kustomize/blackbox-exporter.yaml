@@ -3,11 +3,9 @@ kind: Service
 metadata:
   name: prometheus-blackbox-exporter
   labels:
-    app: promotheus
     comp: blackbox-exporter
 spec:
   selector:
-    app: promotheus
     comp: blackbox-exporter
   ports:
   - name: http
@@ -18,13 +16,11 @@ kind: Deployment
 metadata:
   name: prometheus-blackbox-exporter
   labels:
-    app: promotheus
     comp: blackbox-exporter
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: promotheus
       comp: blackbox-exporter
   strategy:
     type: RollingUpdate
@@ -34,7 +30,6 @@ spec:
   template:
     metadata:
       labels:
-        app: promotheus
         comp: blackbox-exporter
     spec:
       restartPolicy: Always
