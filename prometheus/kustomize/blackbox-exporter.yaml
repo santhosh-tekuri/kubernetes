@@ -10,8 +10,8 @@ spec:
     app: promotheus
     comp: blackbox-exporter
   ports:
-    - name: http
-      port: 9115
+  - name: http
+    port: 9115
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -39,28 +39,28 @@ spec:
     spec:
       restartPolicy: Always
       volumes:
-        - name: config
-          configMap:
-            name: prometheus-blackbox-exporter
+      - name: config
+        configMap:
+          name: prometheus-blackbox-exporter
       containers:
-        - name: blackbox-exporter
-          image: prom/blackbox-exporter:v0.16.0
-          securityContext:
-            readOnlyRootFilesystem: true
-            runAsNonRoot: true
-            runAsUser: 1000
-          ports:
-            - name: http
-              containerPort: 9115
-          volumeMounts:
-            - name: config
-              mountPath: /etc/blackbox_exporter/config.yml
-              subPath: blackbox.yml
-          livenessProbe:
-            httpGet:
-              path: /health
-              port: http
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: http
+      - name: blackbox-exporter
+        image: prom/blackbox-exporter:v0.16.0
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+        ports:
+        - name: http
+          containerPort: 9115
+        volumeMounts:
+        - name: config
+          mountPath: /etc/blackbox_exporter/config.yml
+          subPath: blackbox.yml
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: http
