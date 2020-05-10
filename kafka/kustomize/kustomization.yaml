@@ -5,3 +5,4 @@ configMapGenerator:
 resources:
   - broker.yaml
   - metrics.yaml
+  - create-topics.yaml
