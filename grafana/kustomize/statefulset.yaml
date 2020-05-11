@@ -5,8 +5,8 @@ metadata:
 spec:
   clusterIP: None
   ports:
-    - name: http
-      port: 3000
+  - name: http
+    port: 3000
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -36,7 +36,6 @@ spec:
       containers:
         - name: grafana
           image: grafana/grafana:6.7.3
-          imagePullPolicy: IfNotPresent
           volumeMounts:
           - name: config
             mountPath: /etc/grafana/grafana.ini
@@ -49,17 +48,9 @@ spec:
           ports:
           - name: grafana
             containerPort: 3000
-          env:
-          - name: GF_SECURITY_ADMIN_USER
-            valueFrom:
-              secretKeyRef:
-                name: grafana
-                key: admin-user
-          - name: GF_SECURITY_ADMIN_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: grafana
-                key: admin-password
+          envFrom:
+          - secretRef:
+              name: grafana
           livenessProbe:
             initialDelaySeconds: 60
             timeoutSeconds: 30
