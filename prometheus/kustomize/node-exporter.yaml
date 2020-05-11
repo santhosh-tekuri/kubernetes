@@ -31,6 +31,9 @@ spec:
       labels:
         comp: node-exporter
     spec:
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
       hostNetwork: true
       hostPID: true
       volumes:
