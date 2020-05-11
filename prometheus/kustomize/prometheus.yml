@@ -6,6 +6,25 @@ global:
   # How frequently to evaluate rules.
   evaluation_interval: 1m
 
+alerting:
+  alertmanagers:
+  - kubernetes_sd_configs:
+    - role: pod
+    relabel_configs:
+    - source_labels: [__meta_kubernetes_namespace]
+      regex: kube-system
+      action: keep
+    - source_labels: [__meta_kubernetes_pod_label_app]
+      regex: prometheus
+      action: keep
+    - source_labels: [__meta_kubernetes_pod_label_comp]
+      regex: alertmanager
+      action: keep
+    - source_labels: [__meta_kubernetes_pod_container_port_name]
+      regex: http
+      action: keep
+
+
 scrape_configs:
 
 - job_name: prometheus

@@ -1,14 +1,18 @@
-namespace: kube-system
+namespace: kube-system # should match the namespace in prometheus.yml/alerting.alertmanagers.relabel_configs.regex
 commonLabels:
   app: prometheus
 configMapGenerator:
 - name: prometheus-server
   files:
   - prometheus.yml
+- name: prometheus-alertmanager
+  files:
+  - alertmanager.yml
 - name: prometheus-blackbox-exporter
   files:
   - blackbox.yml
 resources:
   - server.yaml
+  - alertmanager.yaml
   - blackbox-exporter.yaml
   - node-exporter.yaml
