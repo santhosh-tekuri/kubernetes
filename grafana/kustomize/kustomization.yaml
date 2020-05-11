@@ -1,0 +1,16 @@
+namespace: kube-system
+commonLabels:
+  app: grafana
+configMapGenerator:
+  - name: grafana
+    files:
+    - grafana.ini
+    - datasources.yaml
+secretGenerator:
+- name: grafana
+  literals:
+  - admin-user=admin
+  - admin-password=password
+resources:
+  - service.yaml
+  - statefulset.yaml
