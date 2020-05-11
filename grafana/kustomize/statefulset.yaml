@@ -17,7 +17,7 @@ spec:
   serviceName: grafana-headless
   volumeClaimTemplates:
   - metadata:
-      name: storage
+      name: datadir
     spec:
       accessModes: [ReadWriteOnce]
       resources:
@@ -44,7 +44,7 @@ spec:
           - name: config
             mountPath: /etc/grafana/provisioning/datasources/datasources.yaml
             subPath: datasources.yaml
-          - name: storage
+          - name: datadir
             mountPath: /var/lib/grafana
           ports:
           - name: grafana
