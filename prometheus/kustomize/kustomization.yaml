@@ -5,6 +5,8 @@ configMapGenerator:
 - name: prometheus-server
   files:
   - prometheus.yml
+  - recording_rules.yml
+  - alerting_rules.yml
 - name: prometheus-alertmanager
   files:
   - alertmanager.yml

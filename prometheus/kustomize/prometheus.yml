@@ -6,6 +6,10 @@ global:
   # How frequently to evaluate rules.
   evaluation_interval: 1m
 
+rule_files:
+  - recording_rules.yml
+  - alerting_rules.yml
+
 alerting:
   alertmanagers:
   - kubernetes_sd_configs:

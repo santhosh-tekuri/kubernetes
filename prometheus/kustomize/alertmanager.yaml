@@ -1,6 +1,19 @@
 apiVersion: v1
 kind: Service
 metadata:
+  name: prometheus-alertmanager
+  labels:
+    comp: alertmanager
+spec:
+  selector:
+    comp: alertmanager
+  ports:
+  - name: http
+    port: 9093
+---
+apiVersion: v1
+kind: Service
+metadata:
   name: prometheus-alertmanager-headless
   labels:
     comp: alertmanager
@@ -45,12 +58,6 @@ spec:
       containers:
       - name: prometheus-alertmanager
         image: prom/alertmanager:v0.20.0
-        env:
-        - name: POD_IP
-          valueFrom:
-            fieldRef:
-              apiVersion: v1
-              fieldPath: status.podIP
         ports:
         - name: http
           containerPort: 9093
