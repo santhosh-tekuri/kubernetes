@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube-state-metrics
+spec:
+  replicas: 1
+  template:
+    spec:
+      serviceAccountName: kube-state-metrics
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+      - name: kube-state-metrics
+        image: quay.io/coreos/kube-state-metrics:v1.9.5
+        securityContext:
+          runAsUser: 65534
+        ports:
+        - name: http-metrics
+          containerPort: 8080
+        - name: telemetry
+          containerPort: 8081
+        readinessProbe:
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          httpGet:
+            path: /
+            port: 8081
+        livenessProbe:
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          httpGet:
+            path: /healthz
+            port: 8080
