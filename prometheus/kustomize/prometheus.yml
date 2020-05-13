@@ -51,7 +51,7 @@ scrape_configs:
     action: keep
     regex: default;kubernetes;https
 
-- job_name: kubernetes-nodes
+- job_name: kubelet
   scheme: https
   tls_config:
     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
