@@ -115,6 +115,14 @@ scrape_configs:
     regex: kube-system;control-plane;kube-scheduler
     action: keep
 
+- job_name: kube-controller-manager
+  kubernetes_sd_configs:
+  - role: service
+  relabel_configs:
+  - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_label_tier, __meta_kubernetes_service_label_component]
+    regex: kube-system;control-plane;kube-controller-manager
+    action: keep
+
 - job_name: kubernetes-service-endpoints
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
   kubernetes_sd_configs:
