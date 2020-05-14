@@ -38,7 +38,7 @@ scrape_configs:
 
 # see https://github.com/prometheus/prometheus/blob/release-2.18/documentation/examples/prometheus-kubernetes.yml
 
-- job_name: kubernetes-apiservers
+- job_name: kube-apiserver
   scheme: https
   tls_config:
     ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
@@ -105,6 +105,14 @@ scrape_configs:
   - source_labels: [__meta_kubernetes_pod_node_name]
     target_label: instance
     action: replace
+
+- job_name: kube-scheduler
+  kubernetes_sd_configs:
+  - role: service
+  relabel_configs:
+  - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_label_tier, __meta_kubernetes_service_label_component]
+    regex: kube-system;control-plane;kube-scheduler
+    action: keep
 
 - job_name: kubernetes-service-endpoints
   bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token

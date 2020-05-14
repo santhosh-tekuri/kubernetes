@@ -14,7 +14,8 @@ configMapGenerator:
   files:
   - blackbox.yml
 resources:
-  - server.yaml
   - alertmanager.yaml
   - blackbox-exporter.yaml
   - node-exporter.yaml
+  - kube-scheduler.yaml
+  - server.yaml
