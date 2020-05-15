@@ -14,9 +14,11 @@ image=ubuntu:18.04
 
 set -ex
 
-modprobe br_netfilter
+# allow access to lxd commands to current user
 user_name=$(logname)
 gpasswd -a $user_name lxd
+
+modprobe br_netfilter
 lxd init --auto
 
 # create k8s profile
