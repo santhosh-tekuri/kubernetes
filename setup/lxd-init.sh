@@ -47,6 +47,8 @@ iface=eth0
 metallb_addresses="${subnet}.200-${subnet}.250"
 registry_ip="${subnet}.250"
 ingress_ip="${subnet}.249"
+echo "$registry_ip registry.local" >> /etc/hosts
+echo "$ingress_ip ingress.local" >> /etc/hosts
 
 lxc launch $image master --profile k8s
 sleep 10 # wait for network ready
