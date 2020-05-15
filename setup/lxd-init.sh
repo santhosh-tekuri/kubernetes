@@ -49,6 +49,7 @@ registry_ip="${subnet}.250"
 ingress_ip="${subnet}.249"
 
 lxc launch $image master --profile k8s
+sleep 5 # wait for network ready
 ipaddr=$(lxc exec master -- ip -4 -o addr show ${iface} | awk '{print $4}' | cut -d "/" -f 1)
 echo $ipaddr master.lxd >> /etc/hosts
 lxc config device add master vagrant disk source=/vagrant path=/vagrant
@@ -69,6 +70,7 @@ mv ./kubectl /usr/local/bin/kubectl
 
 for i in $(seq $workers); do
     lxc launch $image worker$i --profile k8s
+    sleep 5 # wait for network ready
     ipaddr=$(lxc exec worker${i} -- ip -4 -o addr show ${iface} | awk '{print $4}' | cut -d "/" -f 1)
     echo $ipaddr worker${i}.lxd >> /etc/hosts
     lxc config device add worker$i vagrant disk source=/vagrant path=/vagrant
