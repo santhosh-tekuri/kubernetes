@@ -21,13 +21,9 @@ spec:
                   cmd="$cmd --config=$config"
               done
               echo + $cmd
-              while :; do
-                  if eval $cmd; then
-                      break
-                  else
-                      sleep 10
-                      echo retrying...
-                  fi
+              until $cmd; do
+                  sleep 10
+                  echo retrying...
               done
           done
         args:
