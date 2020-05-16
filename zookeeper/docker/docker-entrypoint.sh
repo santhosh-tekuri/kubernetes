@@ -17,7 +17,7 @@ fi
 if [[ ! -f "conf/zoo.cfg.dynamic" ]]; then
     {
         for i in $(seq 1 $REPLICAS); do
-		echo "server.$i=$NAME-$((i-1)).$DOMAIN:2888:3888;2181"
+            echo "server.$i=$NAME-$((i-1)).$DOMAIN:2888:3888;2181"
         done
     } > conf/zoo.cfg.dynamic
 fi
