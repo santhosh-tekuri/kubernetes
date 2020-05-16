@@ -153,14 +153,9 @@ function install_pod_network() {
 
     # wait until network is ready
     arch=`kubectl get node master -o 'jsonpath={.metadata.labels.beta\.kubernetes\.io/arch}'`
-    for i in {1..100}; do
-      echo iteration $i...
-      sleep 5
-      if kubectl -n kube-system get daemonset kube-flannel-ds-${arch} -o 'jsonpath={.status.numberAvailable}' | grep 1; then
-        break
-      fi
+    until kubectl -n kube-system get daemonset kube-flannel-ds-${arch} -o 'jsonpath={.status.numberAvailable}' | grep 1; do
+        sleep 5
     done
-    kubectl -n kube-system get daemonset kube-flannel-ds-${arch} -o 'jsonpath={.status.numberAvailable}' | grep 1
 }
 
 function install_nfs_server() {
@@ -168,7 +163,7 @@ function install_nfs_server() {
     mkdir /kubedata
     chmod 777 /kubedata
     echo "/kubedata *(rw,sync,no_subtree_check,no_root_squash,no_all_squash,insecure)" >> /etc/exports
-    exportfs -rav    
+    exportfs -rav
 }
 
 function install_nfs_client() {
@@ -199,12 +194,8 @@ function install_nfs_provisioner() {
     rm deployment.yaml
 
     # wait until deployment is ready
-    for i in {1..100}; do
-      echo iteration $i...
-      sleep 5
-      if kubectl get -n nfs-provisioner deployment nfs-client-provisioner -o 'jsonpath={.status.availableReplicas}' | grep 1; then
-        break
-      fi
+    until kubectl get -n nfs-provisioner deployment nfs-client-provisioner -o 'jsonpath={.status.availableReplicas}' | grep 1; do
+        sleep 5
     done
 
     # mark storage class as default
