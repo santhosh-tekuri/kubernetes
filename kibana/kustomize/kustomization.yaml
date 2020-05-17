@@ -1,5 +1,5 @@
 commonLabels:
   app: kibana
 resources:
-  - deployment.yaml
-  - service.yaml
+- deployment.yaml
+- service.yaml

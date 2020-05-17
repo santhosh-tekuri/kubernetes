@@ -5,5 +5,5 @@ configMapGenerator:
   files:
   - zoo.cfg
 resources:
-  - statefulset.yaml
-  - service.yaml
+- statefulset.yaml
+- service.yaml

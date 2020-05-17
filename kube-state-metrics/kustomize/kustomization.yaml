@@ -2,6 +2,6 @@ namespace: kube-system
 commonLabels:
   app: kube-state-metrics
 resources:
-  - rbac.yaml
-  - deployment.yaml
-  - service.yaml
+- rbac.yaml
+- deployment.yaml
+- service.yaml

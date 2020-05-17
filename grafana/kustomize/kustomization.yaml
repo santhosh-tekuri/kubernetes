@@ -12,5 +12,5 @@ secretGenerator:
   - GF_SECURITY_ADMIN_USER=admin
   - GF_SECURITY_ADMIN_PASSWORD=password
 resources:
-  - service.yaml
-  - statefulset.yaml
+- service.yaml
+- statefulset.yaml

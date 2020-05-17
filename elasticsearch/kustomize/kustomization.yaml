@@ -1,5 +1,5 @@
 commonLabels:
   app: es
 resources:
-  - statefulset.yaml
-  - service.yaml
+- statefulset.yaml
+- service.yaml

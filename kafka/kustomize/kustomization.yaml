@@ -5,6 +5,6 @@ configMapGenerator:
   files:
   - server.properties
 resources:
-  - broker.yaml
-  - metrics.yaml
-  - create-topics.yaml
+- broker.yaml
+- metrics.yaml
+- create-topics.yaml
