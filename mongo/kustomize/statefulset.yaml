@@ -1,0 +1,125 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-headless
+spec:
+  publishNotReadyAddresses: true
+  clusterIP: None
+  ports:
+  - name: mongodb
+    port: 27017
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+spec:
+  serviceName: mongodb-headless
+  replicas: 3
+  podManagementPolicy: Parallel
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ReadWriteOnce]
+      resources:
+        requests:
+          storage: 2Gi
+  template:
+    spec:
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
+        runAsNonRoot: true
+      volumes:
+      - name: config
+        configMap:
+          name: mongodb-config
+      containers:
+      - name: mongodb
+        image: mongo:4.2.6
+        ports:
+        - name: mongodb
+          containerPort: 27017
+        env:
+        - name: REPLICAS
+          value: "3" # should match Statefulset.spec.replicas
+        command:
+        - mongod
+        args:
+        - --config=/etc/mongod.conf
+        - --replSet=rs0
+        lifecycle:
+          postStart:
+            exec:
+              command:
+              - bash
+              - -c
+              - |
+                set -e
+
+                # wait until server is ready
+                until mongo --eval 'db.adminCommand("ping")'; do
+                  sleep 5
+                done
+
+                HOST=$(hostname -s)
+                DOMAIN=$(hostname -d)
+                if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
+                    NAME=${BASH_REMATCH[1]}
+                    ORD=${BASH_REMATCH[2]}
+                else
+                    echo "Failed to parse hostname $HOST"
+                    exit 1
+                fi
+
+                # skip is ordinal is not zero
+                if [ "$ORD" != "0" ]; then
+                  exit 0
+                fi
+
+                cat <<EOF | mongo
+                var resp = rs.status()
+                if(resp.code!=94) {
+                    print("already configured")
+                    quit(0)
+                }
+                resp = rs.initiate({
+                    _id: "rs0",
+                    members: [
+                        { _id: 0, host: "$NAME-0.$DOMAIN" }
+                    ]
+                })
+                printjson(resp)
+                if(!resp.ok) {
+                  quit(2)
+                }
+                for(i=1; i<$REPLICAS; i++) {
+                    resp = rs.add("$NAME-"+i+".$DOMAIN")
+                    printjson(resp)
+                    if(!resp.ok) {
+                      quit(3)
+                    }
+                }
+                EOF
+        volumeMounts:
+        - name: config
+          mountPath: /etc/mongod.conf
+          subPath: mongod.conf
+        - name: datadir
+          mountPath: /data
+        readinessProbe:
+          initialDelaySeconds: 5
+          exec:
+            command:
+            - mongo
+            - --eval
+            - db.adminCommand('ping')
+        livenessProbe:
+          initialDelaySeconds: 5
+          exec:
+            command:
+            - mongo
+            - --eval
+            - db.adminCommand('ping')

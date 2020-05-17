@@ -1,0 +1,8 @@
+commonLabels:
+  app: mongodb
+configMapGenerator:
+- name: mongodb-config
+  files:
+  - mongod.conf
+resources:
+- statefulset.yaml
