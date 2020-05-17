@@ -59,11 +59,6 @@ spec:
               - |
                 set -e
 
-                # wait until server is ready
-                until mongo --eval 'db.adminCommand("ping")'; do
-                  sleep 5
-                done
-
                 HOST=$(hostname -s)
                 DOMAIN=$(hostname -d)
                 if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
@@ -79,12 +74,22 @@ spec:
                   exit 0
                 fi
 
-                cat <<EOF | mongo
+                # wait until servers are ready
+                for i in $(seq 0 $((REPLICAS-1))); do
+                    until mongo --host "$NAME-$i.$DOMAIN" --eval quit > /dev/null 2>&1; do
+                        echo "replica $i not ready yet"
+                        sleep 5
+                    done
+                done
+
+                cat <<EOF > /tmp/init.sh
                 var resp = rs.status()
+                printjson(resp)
                 if(resp.code!=94) {
                     print("already configured")
                     quit(0)
                 }
+                print("initiating replicaSet...")
                 resp = rs.initiate({
                     _id: "rs0",
                     members: [
@@ -95,14 +100,20 @@ spec:
                 if(!resp.ok) {
                   quit(2)
                 }
-                for(i=1; i<$REPLICAS; i++) {
+                while(rs.status().members[0].stateStr!="PRIMARY"){
+                    print("waiting to become primary...")
+                    sleep(2000)
+                }
+                for(i=1; i<$REPLICAS; i++){
+                    print("adding $NAME-"+i+".$DOMAIN...")
                     resp = rs.add("$NAME-"+i+".$DOMAIN")
                     printjson(resp)
                     if(!resp.ok) {
-                      quit(3)
+                        quit(2+i)
                     }
                 }
                 EOF
+                mongo /tmp/init.sh
         volumeMounts:
         - name: config
           mountPath: /etc/mongod.conf
