@@ -66,11 +66,11 @@ spec:
       labels:
         comp: broker
     spec:
+      terminationGracePeriodSeconds: 120
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
-      terminationGracePeriodSeconds: 120
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

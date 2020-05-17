@@ -88,11 +88,11 @@ spec:
       labels:
         comp: server
     spec:
+      terminationGracePeriodSeconds: 300
       securityContext:
         fsGroup: 65534
         runAsGroup: 65534
         runAsUser: 65534
-      terminationGracePeriodSeconds: 300
       serviceAccountName: prometheus-server
       volumes:
       - name: config

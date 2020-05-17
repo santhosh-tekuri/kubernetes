@@ -42,11 +42,11 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "7000"
     spec:
+      terminationGracePeriodSeconds: 180
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
-      terminationGracePeriodSeconds: 180
       affinity:
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
