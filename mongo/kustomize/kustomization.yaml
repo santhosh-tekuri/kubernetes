@@ -4,5 +4,9 @@ configMapGenerator:
 - name: mongodb-config
   files:
   - mongod.conf
+secretGenerator:
+- name: mongodb
+  files:
+  - keyfile
 resources:
 - statefulset.yaml

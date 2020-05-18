@@ -36,6 +36,28 @@ spec:
       - name: config
         configMap:
           name: mongodb-config
+      - name: secret-tmp
+        secret:
+          secretName: mongodb
+      - name: secret
+        emptyDir: {}
+      initContainers:
+      - name: init
+        image: mongo:4.2.6
+        volumeMounts:
+        - name: secret-tmp
+          mountPath: /secret-tmp
+        - name: secret
+          mountPath: /etc/mongokey
+        command:
+        - bash
+        - -c
+        - |
+          set -e
+          ls -al /secret-tmp
+          cp /secret-tmp/keyfile /etc/mongokey/key
+          chmod 400 /etc/mongokey/key
+          chown mongodb:mongodb /etc/mongokey/key
       containers:
       - name: mongodb
         image: mongo:4.2.6
@@ -49,6 +71,7 @@ spec:
         - mongod
         args:
         - --config=/etc/mongod.conf
+        - --keyFile=/etc/mongokey/key
         - --replSet=rs0
         lifecycle:
           postStart:
@@ -71,7 +94,7 @@ spec:
 
                 # skip if ordinal is not zero
                 if [ "$ORD" != "0" ]; then
-                  exit 0
+                    exit 0
                 fi
 
                 # wait until servers are ready
@@ -82,7 +105,8 @@ spec:
                     done
                 done
 
-                cat <<EOF > /tmp/init.sh
+                cat <<EOF > /tmp/init.js
+                db = db.getSiblingDB("admin")
                 var resp = rs.status()
                 printjson(resp)
                 if(resp.code!=94) {
@@ -99,11 +123,19 @@ spec:
                 })
                 printjson(resp)
                 if(!resp.ok) {
-                  quit(2)
+                    quit(2)
                 }
                 while(rs.status().members[0].stateStr!="PRIMARY"){
                     print("waiting to become primary...")
                     sleep(2000)
+                }
+                db.createUser({
+                    user: "root",
+                    pwd: "secret",
+                    roles: [ { role: "root", db: "admin" } ]
+                })
+                if(db.auth("root", "secret")!=1) {
+                    quit(100)
                 }
                 for(i=1; i<$REPLICAS; i++){
                     print("adding replica "+i+"...")
@@ -114,11 +146,15 @@ spec:
                     }
                 }
                 EOF
-                mongo /tmp/init.sh
+                mongo /tmp/init.js
         volumeMounts:
         - name: config
           mountPath: /etc/mongod.conf
           subPath: mongod.conf
+        - name: secret-tmp
+          mountPath: /secret-tmp
+        - name: secret
+          mountPath: /etc/mongokey
         - name: datadir
           mountPath: /data
         readinessProbe:
