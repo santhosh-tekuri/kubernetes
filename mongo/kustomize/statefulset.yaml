@@ -36,17 +36,12 @@ spec:
       - name: config
         configMap:
           name: mongodb-config
-      - name: secret-tmp
-        secret:
-          secretName: mongodb
       - name: secret
         emptyDir: {}
       initContainers:
       - name: init
         image: mongo:4.2.6
         volumeMounts:
-        - name: secret-tmp
-          mountPath: /secret-tmp
         - name: secret
           mountPath: /etc/mongokey
         envFrom:
@@ -164,8 +159,6 @@ spec:
         - name: config
           mountPath: /etc/mongod.conf
           subPath: mongod.conf
-        - name: secret-tmp
-          mountPath: /secret-tmp
         - name: secret
           mountPath: /etc/mongokey
         - name: datadir
