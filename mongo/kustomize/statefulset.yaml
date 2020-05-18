@@ -68,7 +68,11 @@ spec:
         - name: REPLICAS
           value: "3" # should match Statefulset.spec.replicas
         - name: ROOT_PASSWORD
-          value: secret
+          valueFrom:
+            secretKeyRef:
+              name: mongodb
+              key: ROOT_PASSWORD
+              optional: true
         command:
         - mongod
         args:
