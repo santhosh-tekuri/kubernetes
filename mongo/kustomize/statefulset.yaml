@@ -54,11 +54,11 @@ spec:
         - |
           set -e
           if [[ -n "$keyfile" ]]; then
-              cat <<EOF >/etc/mongoauth/key
+              cat <<EOF >/etc/mongoauth/keyfile
           $keyfile
           EOF
-              chmod 400 /etc/mongoauth/key
-              chown mongodb:mongodb /etc/mongoauth/key
+              chmod 400 /etc/mongoauth/keyfile
+              chown mongodb:mongodb /etc/mongoauth/keyfile
           fi
       containers:
       - name: mongodb
@@ -77,7 +77,7 @@ spec:
         - mongod
         args:
         - --config=/etc/mongod.conf
-        - --keyFile=/etc/mongoauth/key
+        - --keyFile=/etc/mongoauth/keyfile
         - --replSet=rs0
         lifecycle:
           postStart:
