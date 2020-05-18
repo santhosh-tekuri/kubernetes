@@ -35,7 +35,7 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: mongodb-config
+          name: mongodb
       - name: secret
         emptyDir: {}
       initContainers:

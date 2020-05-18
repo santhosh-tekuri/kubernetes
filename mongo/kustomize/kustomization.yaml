@@ -1,7 +1,7 @@
 commonLabels:
   app: mongodb
 configMapGenerator:
-- name: mongodb-config
+- name: mongodb
   files:
   - mongod.conf
 secretGenerator:
