@@ -36,13 +36,13 @@ spec:
       - name: config
         configMap:
           name: mongodb
-      - name: secret
+      - name: auth
         emptyDir: {}
       initContainers:
       - name: init
         image: mongo:4.2.6
         volumeMounts:
-        - name: secret
+        - name: auth
           mountPath: /etc/mongoauth
         envFrom:
         - secretRef:
@@ -159,7 +159,7 @@ spec:
         - name: config
           mountPath: /etc/mongod.conf
           subPath: mongod.conf
-        - name: secret
+        - name: auth
           mountPath: /etc/mongoauth
         - name: datadir
           mountPath: /data
