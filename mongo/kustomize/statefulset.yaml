@@ -69,7 +69,7 @@ spec:
                     exit 1
                 fi
 
-                # skip is ordinal is not zero
+                # skip if ordinal is not zero
                 if [ "$ORD" != "0" ]; then
                   exit 0
                 fi
@@ -89,6 +89,7 @@ spec:
                     print("already configured")
                     quit(0)
                 }
+
                 print("initiating replicaSet...")
                 resp = rs.initiate({
                     _id: "rs0",
@@ -105,7 +106,7 @@ spec:
                     sleep(2000)
                 }
                 for(i=1; i<$REPLICAS; i++){
-                    print("adding $NAME-"+i+".$DOMAIN...")
+                    print("adding replica "+i+"...")
                     resp = rs.add("$NAME-"+i+".$DOMAIN")
                     printjson(resp)
                     if(!resp.ok) {
