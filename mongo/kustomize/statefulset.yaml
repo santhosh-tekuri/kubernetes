@@ -43,7 +43,7 @@ spec:
         image: mongo:4.2.6
         volumeMounts:
         - name: secret
-          mountPath: /etc/mongokey
+          mountPath: /etc/mongoauth
         envFrom:
         - secretRef:
             name: mongodb
@@ -54,11 +54,11 @@ spec:
         - |
           set -e
           if [[ -n "$keyfile" ]]; then
-              cat <<EOF >/etc/mongokey/key
+              cat <<EOF >/etc/mongoauth/key
           $keyfile
           EOF
-              chmod 400 /etc/mongokey/key
-              chown mongodb:mongodb /etc/mongokey/key
+              chmod 400 /etc/mongoauth/key
+              chown mongodb:mongodb /etc/mongoauth/key
           fi
       containers:
       - name: mongodb
@@ -77,7 +77,7 @@ spec:
         - mongod
         args:
         - --config=/etc/mongod.conf
-        - --keyFile=/etc/mongokey/key
+        - --keyFile=/etc/mongoauth/key
         - --replSet=rs0
         lifecycle:
           postStart:
@@ -160,7 +160,7 @@ spec:
           mountPath: /etc/mongod.conf
           subPath: mongod.conf
         - name: secret
-          mountPath: /etc/mongokey
+          mountPath: /etc/mongoauth
         - name: datadir
           mountPath: /data
         readinessProbe:
