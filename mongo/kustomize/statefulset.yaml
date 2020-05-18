@@ -67,6 +67,8 @@ spec:
         env:
         - name: REPLICAS
           value: "3" # should match Statefulset.spec.replicas
+        - name: ROOT_PASSWORD
+          value: secret
         command:
         - mongod
         args:
@@ -129,13 +131,15 @@ spec:
                     print("waiting to become primary...")
                     sleep(2000)
                 }
-                db.createUser({
-                    user: "root",
-                    pwd: "secret",
-                    roles: [ { role: "root", db: "admin" } ]
-                })
-                if(db.auth("root", "secret")!=1) {
-                    quit(100)
+                if("$ROOT_PASSWORD"!="") {
+                    db.createUser({
+                        user: "root",
+                        pwd: "$ROOT_PASSWORD",
+                        roles: [ { role: "root", db: "admin" } ]
+                    })
+                    if(db.auth("root", "$ROOT_PASSWORD")!=1) {
+                        quit(100)
+                    }
                 }
                 for(i=1; i<$REPLICAS; i++){
                     print("adding replica "+i+"...")
