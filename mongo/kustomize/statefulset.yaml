@@ -49,15 +49,22 @@ spec:
           mountPath: /secret-tmp
         - name: secret
           mountPath: /etc/mongokey
+        envFrom:
+        - secretRef:
+            name: mongodb
+            optional: true
         command:
         - bash
         - -c
         - |
           set -e
-          ls -al /secret-tmp
-          cp /secret-tmp/keyfile /etc/mongokey/key
-          chmod 400 /etc/mongokey/key
-          chown mongodb:mongodb /etc/mongokey/key
+          if [[ -n "$keyfile" ]]; then
+              cat <<EOF >/etc/mongokey/key
+          $keyfile
+          EOF
+              chmod 400 /etc/mongokey/key
+              chown mongodb:mongodb /etc/mongokey/key
+          fi
       containers:
       - name: mongodb
         image: mongo:4.2.6
@@ -67,12 +74,10 @@ spec:
         env:
         - name: REPLICAS
           value: "3" # should match Statefulset.spec.replicas
-        - name: ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: mongodb
-              key: ROOT_PASSWORD
-              optional: true
+        envFrom:
+        - secretRef:
+            name: mongodb
+            optional: true
         command:
         - mongod
         args:
