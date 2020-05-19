@@ -14,7 +14,7 @@ spec:
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: es-pdb
+  name: es
 spec:
   minAvailable: 2
 ---
@@ -30,7 +30,7 @@ spec:
   - metadata:
       name: datadir
     spec:
-      accessModes: [ "ReadWriteOnce" ]
+      accessModes: [ReadWriteOnce]
       resources:
         requests:
           storage: 1Gi
