@@ -75,7 +75,7 @@ spec:
         - name: cluster.name
           value: elasticsearch
         - name: cluster.initial_master_nodes
-          value: es-0,es-1,es-2
+          value: es-0,es-1,es-2 # update based on replicas
         - name: discovery.seed_hosts
           value: es-headless
         - name: ES_JAVA_OPTS
