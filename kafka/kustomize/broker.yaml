@@ -29,7 +29,7 @@ spec:
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: kafka-pdb
+  name: kafka
   labels:
     comp: broker
 spec:
@@ -57,7 +57,7 @@ spec:
       labels:
         comp: broker
     spec:
-      accessModes: [ "ReadWriteOnce" ]
+      accessModes: [ReadWriteOnce]
       resources:
         requests:
           storage: 1Gi
