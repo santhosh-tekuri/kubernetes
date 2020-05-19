@@ -92,7 +92,7 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: kafka-config
+          name: kafka
       containers:
       - name: broker
         imagePullPolicy: Always

@@ -3,22 +3,22 @@ kind: Deployment
 metadata:
   name: kafka-exporter
   labels:
-    comp: metrics
+    comp: exporter
 spec:
   replicas: 1
   selector:
     matchLabels:
-      comp: metrics
+      comp: exporter
   template:
     metadata:
       labels:
-        comp: metrics
+        comp: exporter
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "9308"
     spec:
       containers:
-      - name: metrics-exporter
+      - name: exporter
         image: danielqsj/kafka-exporter:v1.2.0
         ports:
         - name: http

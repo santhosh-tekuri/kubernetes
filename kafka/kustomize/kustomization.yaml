@@ -1,10 +1,10 @@
 commonLabels:
   app: kafka
 configMapGenerator:
-- name: kafka-config
+- name: kafka
   files:
   - server.properties
 resources:
 - broker.yaml
-- metrics.yaml
+- exporter.yaml
 - create-topics.yaml
