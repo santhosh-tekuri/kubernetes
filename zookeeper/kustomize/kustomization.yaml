@@ -1,7 +1,7 @@
 commonLabels:
   app: zk
 configMapGenerator:
-- name: zk-config
+- name: zk
   files:
   - zoo.cfg
 resources:
