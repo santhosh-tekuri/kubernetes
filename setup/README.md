@@ -1,10 +1,13 @@
 # kubernetes-vagrant
 
-kubernetes 1.15 multinode cluster using vagrant
+kubernetes 1.18 multinode cluster using vagrant
 
 there are two types of setups available:
-- using virtualbox machines: do `ln -s Vagrantfile.vbox Vagrantfile`
-- using lxd containers: do `ln -s Vagrantfile.lxd Vagrantfile`
+- using virtualbox machines:
+  - do `ln -s Vagrantfile.vbox Vagrantfile`
+- using lxd containers:
+  - do `ln -s Vagrantfile.lxd Vagrantfile`
+  - do `vagrant plugin install vagrant-disksize`
 
 
 the cluster includes:
