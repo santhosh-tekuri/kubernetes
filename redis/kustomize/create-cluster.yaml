@@ -21,7 +21,7 @@ spec:
           set -eo pipefail
           nodes=""
           for i in $(seq 0 $((STATEFULSET_REPLICAS-1))); do
-              until redis-cli -h redis-$i ping >/dev/null 2>&1; do
+              until timeout -s SIGKILL 5s redis-cli -h redis-$i ping >/dev/null 2>&1; do
                   echo redis-$i is not yet ready. waiting...
                   sleep 2
               done
