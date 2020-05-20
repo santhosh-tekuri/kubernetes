@@ -77,4 +77,25 @@ spec:
         volumeMounts:
         - name: datadir
           mountPath: /data
-
+        readinessProbe:
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 5
+          exec:
+            command:
+            - bash
+            - -c
+            - |
+              set -e
+              test "$(redis-cli ping)" == "PONG"
+        livenessProbe:
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 5
+          exec:
+            command:
+            - bash
+            - -c
+            - |
+              set -e
+              test "$(redis-cli ping)" == "PONG"
