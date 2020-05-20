@@ -59,11 +59,9 @@ spec:
           SERVICE_IP=$(getent hosts $NAME.$DOMAIN | awk '{ print $1 }')
           mkdir -p /data/conf /data/db
           cp /configtmp/redis.conf /data/conf/redis.conf
-          # replace ${SERVICE_IP} ${USER_NAME} ${PASSWORD}
-          sed -i "s/\${SERVICE_IP}/$SERVICE_IP/g" /data/conf/redis.conf
-          sed -i "s/\${USER_NAME}/$USER_NAME/g" /data/conf/redis.conf
-          sed -i "s/\${PASSWORD}/$PASSWORD/g" /data/conf/redis.conf
-          cat /data/conf/redis.conf
+          sed -i -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
+                 -e "s/\${USER_NAME}/$USER_NAME/g" \
+                 -e "s/\${PASSWORD}/$PASSWORD/g" /data/conf/redis.conf
         volumeMounts:
         - name: config
           mountPath: /configtmp
