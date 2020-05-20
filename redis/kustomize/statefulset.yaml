@@ -1,0 +1,80 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: redis-headless
+spec:
+  publishNotReadyAddresses: true
+  clusterIP: None
+  ports:
+  - name: client
+    port: 6379
+  - name: bus
+    port: 16379
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  serviceName: redis-headless
+  replicas: 6
+  podManagementPolicy: Parallel
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ReadWriteOnce]
+      resources:
+        requests:
+          storage: 1Gi
+  template:
+    spec:
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
+        runAsNonRoot: true
+      volumes:
+      - name: config
+        configMap:
+          name: redis
+      initContainers:
+      - name: init
+        image: redis:6.0.3
+        command:
+        - bash
+        - -c
+        - |
+          set -ex
+          NAME=$(hostname -s)
+          DOMAIN=$(hostname -d)
+          DOMAIN=${DOMAIN:15}
+          until getent hosts $NAME.$DOMAIN >/dev/null 2>&1; do
+              echo dns entry is not yet resolvable
+              sleep 2
+          done
+          SERVICE_IP=$(getent hosts $NAME.$DOMAIN | awk '{ print $1 }')
+          mkdir -p /data/conf /data/db
+          cp /configtmp/redis.conf /data/conf/redis.conf
+          # replace ${SERVICE_IP}
+          sed -i "s/\${SERVICE_IP}/$SERVICE_IP/g" /data/conf/redis.conf
+          cat /data/conf/redis.conf
+        volumeMounts:
+        - name: config
+          mountPath: /configtmp
+        - name: datadir
+          mountPath: /data
+      containers:
+      - name: redis
+        image: redis:6.0.3
+        ports:
+        - name: client
+          containerPort: 6379
+        - name: bus
+          containerPort: 16379
+        command:
+        - redis-server
+        - /data/conf/redis.conf
+        volumeMounts:
+        - name: datadir
+          mountPath: /data
+

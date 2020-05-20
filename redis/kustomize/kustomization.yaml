@@ -1,0 +1,9 @@
+commonLabels:
+  app: redis
+configMapGenerator:
+- name: redis
+  files:
+  - redis.conf
+resources:
+- service.yaml
+- statefulset.yaml
