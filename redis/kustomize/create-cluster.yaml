@@ -14,14 +14,21 @@ spec:
           value: "6"
         - name: CLUSTER_REPLICAS
           value: "1"
+        envFrom:
+        - secretRef:
+            name: redis
+            optional: true
         command:
         - bash
         - -c
         - |
           set -eo pipefail
+          if [ "$USER_NAME" != "" ]; then
+              auth="--user ${USER_NAME} --pass ${PASSWORD}"
+          fi
           nodes=""
           for i in $(seq 0 $((STATEFULSET_REPLICAS-1))); do
-              until timeout -s SIGKILL 5s redis-cli -h redis-$i ping >/dev/null 2>&1; do
+              until timeout -s SIGKILL 5s redis-cli $auth -h redis-$i ping >/dev/null 2>&1; do
                   echo redis-$i is not yet ready. waiting...
                   sleep 2
               done
@@ -29,4 +36,4 @@ spec:
               nodes="$nodes $ip:6379"
           done
           echo nodes: $nodes
-          echo "yes" | redis-cli --cluster create $nodes --cluster-replicas $CLUSTER_REPLICAS
+          echo yes | redis-cli $auth --cluster create $nodes --cluster-replicas $CLUSTER_REPLICAS

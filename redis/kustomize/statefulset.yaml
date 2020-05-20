@@ -40,6 +40,10 @@ spec:
       initContainers:
       - name: init
         image: redis:6.0.3
+        envFrom:
+        - secretRef:
+            name: redis
+            optional: true
         command:
         - bash
         - -c
@@ -55,8 +59,10 @@ spec:
           SERVICE_IP=$(getent hosts $NAME.$DOMAIN | awk '{ print $1 }')
           mkdir -p /data/conf /data/db
           cp /configtmp/redis.conf /data/conf/redis.conf
-          # replace ${SERVICE_IP}
+          # replace ${SERVICE_IP} ${USER_NAME} ${PASSWORD}
           sed -i "s/\${SERVICE_IP}/$SERVICE_IP/g" /data/conf/redis.conf
+          sed -i "s/\${USER_NAME}/$USER_NAME/g" /data/conf/redis.conf
+          sed -i "s/\${PASSWORD}/$PASSWORD/g" /data/conf/redis.conf
           cat /data/conf/redis.conf
         volumeMounts:
         - name: config
@@ -71,6 +77,10 @@ spec:
           containerPort: 6379
         - name: bus
           containerPort: 16379
+        envFrom:
+        - secretRef:
+            name: redis
+            optional: true
         command:
         - redis-server
         - /data/conf/redis.conf
@@ -87,7 +97,10 @@ spec:
             - -c
             - |
               set -e
-              test "$(redis-cli ping)" == "PONG"
+              if [ "$USER_NAME" != "" ]; then
+                  auth="--user ${USER_NAME} --pass ${PASSWORD}"
+              fi
+              test "$(redis-cli $auth ping)" == "PONG"
         livenessProbe:
           initialDelaySeconds: 5
           timeoutSeconds: 5
@@ -98,4 +111,7 @@ spec:
             - -c
             - |
               set -e
-              test "$(redis-cli ping)" == "PONG"
+              if [ "$USER_NAME" != "" ]; then
+                  auth="--user ${USER_NAME} --pass ${PASSWORD}"
+              fi
+              test "$(redis-cli $auth ping)" == "PONG"
