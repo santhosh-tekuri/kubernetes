@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: redis-0
 spec:
+  publishNotReadyAddresses: true
   selector:
     statefulset.kubernetes.io/pod-name: redis-0
   ports:
@@ -16,6 +17,7 @@ kind: Service
 metadata:
   name: redis-1
 spec:
+  publishNotReadyAddresses: true
   selector:
     statefulset.kubernetes.io/pod-name: redis-1
   ports:
@@ -29,6 +31,7 @@ kind: Service
 metadata:
   name: redis-2
 spec:
+  publishNotReadyAddresses: true
   selector:
     statefulset.kubernetes.io/pod-name: redis-2
   ports:
@@ -42,6 +45,7 @@ kind: Service
 metadata:
   name: redis-3
 spec:
+  publishNotReadyAddresses: true
   selector:
     statefulset.kubernetes.io/pod-name: redis-3
   ports:
@@ -55,6 +59,7 @@ kind: Service
 metadata:
   name: redis-4
 spec:
+  publishNotReadyAddresses: true
   selector:
     statefulset.kubernetes.io/pod-name: redis-4
   ports:
@@ -68,6 +73,7 @@ kind: Service
 metadata:
   name: redis-5
 spec:
+  publishNotReadyAddresses: true
   selector:
     statefulset.kubernetes.io/pod-name: redis-5
   ports:
