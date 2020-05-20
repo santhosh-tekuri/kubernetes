@@ -12,8 +12,14 @@ if [[ ! -e /etc/rc.local ]]; then
     echo '#!/bin/sh -e' > /etc/rc.local
     chmod +x /etc/rc.local
 fi
-ln -s /dev/console /dev/kmsg
-echo "ln -s /dev/console /dev/kmsg" >> /etc/rc.local
+if [[ ! -e /dev/kmsg ]]; then
+    ln -s /dev/console /dev/kmsg
+fi
+cat <<EOF >> /etc/rc.local
+if [[ ! -e /dev/kmsg ]]; then
+    ln -s /dev/console /dev/kmsg
+fi
+EOF
 
 BASEDIR=$(dirname "${BASH_SOURCE[0]}")
 ignore_preflight_errors=--ignore-preflight-errors=FileContent--proc-sys-net-bridge-bridge-nf-call-iptables,SystemVerification $BASEDIR/kube-install.sh $*
