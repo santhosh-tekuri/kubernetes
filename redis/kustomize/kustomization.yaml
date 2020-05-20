@@ -7,3 +7,4 @@ configMapGenerator:
 resources:
 - service.yaml
 - statefulset.yaml
+- create-cluster.yaml

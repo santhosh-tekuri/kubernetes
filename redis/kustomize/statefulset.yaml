@@ -44,12 +44,12 @@ spec:
         - bash
         - -c
         - |
-          set -ex
+          set -eo pipefail
           NAME=$(hostname -s)
           DOMAIN=$(hostname -d)
           DOMAIN=${DOMAIN:15}
           until getent hosts $NAME.$DOMAIN >/dev/null 2>&1; do
-              echo dns entry is not yet resolvable
+              echo dns entry is not yet resolvable. waiting...
               sleep 2
           done
           SERVICE_IP=$(getent hosts $NAME.$DOMAIN | awk '{ print $1 }')

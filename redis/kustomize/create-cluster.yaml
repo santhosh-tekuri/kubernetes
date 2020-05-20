@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: redis-create-cluster
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: redis-create-custer
+        image: redis:6.0.3
+        env:
+        - name: STATEFULSET_REPLICAS
+          value: "6"
+        - name: CLUSTER_REPLICAS
+          value: "1"
+        command:
+        - bash
+        - -c
+        - |
+          set -eo pipefail
+          args=""
+          for i in $(seq 0 $((STATEFULSET_REPLICAS-1))); do
+              until redis-cli -h redis-$i ping >/dev/null 2>&1; do
+                  echo redis-$i is not yet ready. waiting...
+                  sleep 2
+              done
+              ip=$(getent hosts redis-$i | awk '{ print $1 }')
+              args="$args $ip:6379"
+          done
+          echo nodes: $args
+          echo "yes" | redis-cli --cluster create $args --cluster-replicas $CLUSTER_REPLICAS
