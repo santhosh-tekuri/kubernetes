@@ -26,8 +26,8 @@ spec:
                   echo retrying...
               done
           done
-        args:
         - --
+        args:
         - test1:1:3:cleanup.policy=compact
         - test2:1:3:cleanup.policy=compact:compression.type=gzip
         - test3:1:3
