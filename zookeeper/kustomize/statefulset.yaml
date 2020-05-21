@@ -60,7 +60,7 @@ spec:
       initContainers:
       - name: init
         imagePullPolicy: Always
-        image: registry.local/santhoshkt/zookeeper:3.6.1
+        image: zookeeper:3.6.1
         volumeMounts:
         - name: datadir
           mountPath: /data
@@ -96,7 +96,7 @@ spec:
       containers:
       - name: zk
         imagePullPolicy: Always
-        image: registry.local/santhoshkt/zookeeper:3.6.1
+        image: zookeeper:3.6.1
         ports:
         - name: peer
           containerPort: 2888
@@ -111,6 +111,9 @@ spec:
           value: /data/conf
         - name: ZK_SERVER_HEAP
           value: "1024" # jvm heapsize in mb
+        command:
+        - zkServer.sh
+        - start-foreground
         volumeMounts:
         - name: config
           mountPath: /data/conf/zoo.cfg
