@@ -103,6 +103,28 @@ spec:
         env:
         - name: KAFKA_HEAP_OPTS
           value: -Xmx512M -Xms512M
+        command:
+        - bash
+        - -c
+        - |
+          set -e
+          HOST=$(hostname -s)
+          DOMAIN=$(hostname -d)
+          if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
+              NAME=${BASH_REMATCH[1]}
+              ORD=${BASH_REMATCH[2]}
+          else
+              echo "Failed to parse hostname $HOST"
+              exit 1
+          fi
+          cp /configtmp/server.properties config/server.properties
+          sed -i -e "s/\${BROKER_ID}/$((ORD+1))/g" \
+                 -e "s/\${HOSTNAME}/$HOST.$DOMAIN/g" config/server.properties
+          exec "$@"
+        - --
+        args:
+        - kafka-server-start.sh
+        - config/server.properties
         volumeMounts:
         - name: config
           mountPath: /configtmp
