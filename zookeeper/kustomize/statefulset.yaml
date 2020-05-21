@@ -85,4 +85,10 @@ spec:
           initialDelaySeconds: 10
           timeoutSeconds: 5
           exec:
-            command: [ "zkOk.sh" ]
+            command:
+            - bash
+            - -c
+            - |
+              set -e
+              resp=$(echo ruok | nc 127.0.0.1 2181)
+              test "$resp" == "imok"

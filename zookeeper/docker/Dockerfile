@@ -17,6 +17,6 @@ ENV JAVA_HOME=/usr/local/openjdk-11 \
 USER zookeeper
 WORKDIR /zookeeper
 EXPOSE 2181 2888 3888 7000
-COPY --chown=zookeeper:zookeeper zkOk.sh docker-entrypoint.sh /zookeeper/bin/
+COPY --chown=zookeeper:zookeeper docker-entrypoint.sh /zookeeper/bin/
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["zkServer.sh", "start-foreground"]
