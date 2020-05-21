@@ -54,9 +54,7 @@ spec:
         - |
           set -e
           if [[ -n "$keyfile" ]]; then
-              cat <<EOF >/etc/mongoauth/keyfile
-          $keyfile
-          EOF
+              printenv keyfile > /etc/mongoauth/keyfile
               chmod 400 /etc/mongoauth/keyfile
               chown mongodb:mongodb /etc/mongoauth/keyfile
           fi
