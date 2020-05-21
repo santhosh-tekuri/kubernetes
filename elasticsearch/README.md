@@ -1,6 +1,6 @@
 # elasticsearch:7.6.2
 
-creates 2 node cluster, with each node as all possible types
+creates 3 node cluster, with each node as all possible types
 - `initContainer` updates system configuration using `sysctl`
 - node name is set to the pod name
 - if you change #replicas:
