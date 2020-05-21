@@ -117,7 +117,7 @@ spec:
               echo "Failed to parse hostname $HOST"
               exit 1
           fi
-          cp /configtmp/server.properties config/server.properties
+          cp /configtmp/* config
           sed -i -e "s/\${BROKER_ID}/$((ORD+1))/g" \
                  -e "s/\${HOSTNAME}/$HOST.$DOMAIN/g" config/server.properties
           exec "$@"
