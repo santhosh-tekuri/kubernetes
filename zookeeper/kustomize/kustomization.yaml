@@ -3,8 +3,8 @@ commonLabels:
 configMapGenerator:
 - name: zk
   files:
-  - zoo.cfg
-  - log4j.properties
+  - conf/zoo.cfg
+  - conf/log4j.properties
 resources:
 - statefulset.yaml
 - service.yaml
