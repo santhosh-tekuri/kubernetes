@@ -55,8 +55,7 @@ spec:
         - |
           set -eo pipefail
           NAME=$(hostname -s)
-          DOMAIN=$(hostname -d)
-          DOMAIN=${DOMAIN:15}
+          DOMAIN=$(hostname -d | cut -c16-)
           until getent hosts $NAME.$DOMAIN >/dev/null 2>&1; do
               echo dns entry is not yet resolvable. waiting...
               sleep 2
