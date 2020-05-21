@@ -2,6 +2,7 @@
 
 creates replicaset of 3 nodes with internal/membership authentication
 
+- enusre env `REPLICAS` matches with replicas in statesfulset
 - `keyfile` stores the shared secret mongodb uses to authenticate to each other
 - creates `root` user with password `secret`, role `root`
   - password is specifed in `ROOT_PASSWORD` in secret
