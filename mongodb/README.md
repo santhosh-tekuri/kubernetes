@@ -14,5 +14,5 @@ creates replicaset of 3 nodes with internal/membership authentication
   - remove the secret resource
   - remove `--keyfile` container argument
 - to connect use:
-  - `mongodb://mongodb-headless`
-  - `mongodb+srv://mongodb-headless.default.svc.cluster.local/?ssl=false`
+  - `mongodb://mongodb`
+  - `mongodb+srv://mongodb.default.svc.cluster.local/?ssl=false`
