@@ -57,6 +57,42 @@ spec:
       - name: config
         configMap:
           name: zk
+      initContainers:
+      - name: init
+        imagePullPolicy: Always
+        image: registry.local/santhoshkt/zookeeper:3.6.1
+        volumeMounts:
+        - name: datadir
+          mountPath: /data
+        env:
+        - name: REPLICAS
+          value: "3" # should match Statefulset.spec.replicas
+        command:
+        - bash
+        - -c
+        - |
+          set -e
+          HOST=$(hostname -s)
+          DOMAIN=$(hostname -d)
+          if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
+              NAME=${BASH_REMATCH[1]}
+              ORD=${BASH_REMATCH[2]}
+          else
+              echo "Failed to parse hostname $HOST"
+              exit 1
+          fi
+          if [ ! -f /data/conf/zoo.cfg.dynamic ]; then
+              mkdir -p /data/conf
+              {
+                  for i in $(seq 1 $REPLICAS); do
+                      echo "server.$i=$NAME-$((i-1)).$DOMAIN:2888:3888;2181"
+                  done
+              } > /data/conf/zoo.cfg.dynamic
+          fi
+          if [ ! -d /data/db/myid ]; then
+              mkdir -p /data/db
+              echo $((ORD+1)) > /data/db/myid
+          fi
       containers:
       - name: zk
         imagePullPolicy: Always
@@ -71,16 +107,19 @@ spec:
         - name: metrics
           containerPort: 7000
         env:
-        - name: REPLICAS
-          value: "3" # should match Statefulset.spec.replicas
+        - name: ZOOCFGDIR
+          value: /data/conf
         - name: ZK_SERVER_HEAP
           value: "1024" # jvm heapsize in mb
         volumeMounts:
         - name: config
-          mountPath: /zookeeper/conf/zoo.cfg
+          mountPath: /data/conf/zoo.cfg
           subPath: zoo.cfg
+        - name: config
+          mountPath: /data/conf/log4j.properties
+          subPath: log4j.properties
         - name: datadir
-          mountPath: /zookeeper/data
+          mountPath: /data
         readinessProbe:
           initialDelaySeconds: 10
           timeoutSeconds: 5

@@ -4,6 +4,7 @@ configMapGenerator:
 - name: zk
   files:
   - zoo.cfg
+  - log4j.properties
 resources:
 - statefulset.yaml
 - service.yaml
