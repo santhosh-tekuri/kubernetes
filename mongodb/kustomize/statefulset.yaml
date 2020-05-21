@@ -38,26 +38,6 @@ spec:
           name: mongodb
       - name: auth
         emptyDir: {}
-      initContainers:
-      - name: init
-        image: mongo:4.2.6
-        volumeMounts:
-        - name: auth
-          mountPath: /etc/mongoauth
-        envFrom:
-        - secretRef:
-            name: mongodb
-            optional: true
-        command:
-        - bash
-        - -c
-        - |
-          set -e
-          if [[ -n "$keyfile" ]]; then
-              printenv keyfile > /etc/mongoauth/keyfile
-              chmod 400 /etc/mongoauth/keyfile
-              chown mongodb:mongodb /etc/mongoauth/keyfile
-          fi
       containers:
       - name: mongodb
         image: mongo:4.2.6
@@ -72,8 +52,18 @@ spec:
             name: mongodb
             optional: true
         command:
-        - mongod
+        - bash
+        - -c
+        - |
+          set -e
+          if [ -n "$keyfile" -a ! -f /etc/mongoauth/keyfile ]; then
+              printenv keyfile > /etc/mongoauth/keyfile
+              chmod 400 /etc/mongoauth/keyfile
+          fi
+          exec "$@"
+        - --
         args:
+        - mongod
         - --config=/etc/mongod.conf
         - --keyFile=/etc/mongoauth/keyfile
         - --replSet=rs0
