@@ -37,9 +37,14 @@ spec:
       - name: config
         configMap:
           name: redis
-      initContainers:
-      - name: init
+      containers:
+      - name: redis
         image: redis:6.0.3
+        ports:
+        - name: client
+          containerPort: 6379
+        - name: bus
+          containerPort: 16379
         envFrom:
         - secretRef:
             name: redis
@@ -62,27 +67,14 @@ spec:
           sed -i -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
                  -e "s/\${USER_NAME}/$USER_NAME/g" \
                  -e "s/\${PASSWORD}/$PASSWORD/g" /data/conf/redis.conf
-        volumeMounts:
-        - name: config
-          mountPath: /configtmp
-        - name: datadir
-          mountPath: /data
-      containers:
-      - name: redis
-        image: redis:6.0.3
-        ports:
-        - name: client
-          containerPort: 6379
-        - name: bus
-          containerPort: 16379
-        envFrom:
-        - secretRef:
-            name: redis
-            optional: true
-        command:
+          exec "$@"
+        - --
+        args:
         - redis-server
         - /data/conf/redis.conf
         volumeMounts:
+        - name: config
+          mountPath: /configtmp
         - name: datadir
           mountPath: /data
         readinessProbe:
