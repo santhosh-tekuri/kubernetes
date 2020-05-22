@@ -8,7 +8,9 @@ configMapGenerator:
 secretGenerator:
 - name: sentinel
   literals:
-  - PASSWORD=secret
+  - SENTINEL_PASSWORD=secret
+  - REDIS_USER=root
+  - REDIS_PASSWORD=secret
 resources:
 - service.yaml
 - statefulset.yaml

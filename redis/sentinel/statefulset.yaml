@@ -43,13 +43,8 @@ spec:
           containerPort: 26379
         envFrom:
         - secretRef:
-            name: redis
-            optional: true
-          prefix: REDIS_
-        - secretRef:
             name: sentinel
             optional: true
-          prefix: SENTINEL_
         command:
         - bash
         - -c
