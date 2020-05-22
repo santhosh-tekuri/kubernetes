@@ -54,18 +54,21 @@ spec:
         - -c
         - |
           set -eo pipefail
-          HOST=$(hostname -s)
-          DOMAIN=$(hostname -d | cut -d. -f2-)
-          until getent hosts $HOST.$DOMAIN >/dev/null 2>&1; do
-              echo dns entry is not yet resolvable. waiting...
-              sleep 2
-          done
-          SERVICE_IP=$(getent hosts $HOST.$DOMAIN | awk '{ print $1 }')
-          mkdir -p /data/conf /data/db
-          cp /configtmp/redis.conf /data/conf/redis.conf
-          sed -i -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
-                 -e "s/\${USER_NAME}/$USER_NAME/g" \
-                 -e "s/\${PASSWORD}/$PASSWORD/g" /data/conf/redis.conf
+          if [ ! -f /data/conf/redis.conf ]; then
+            HOST=$(hostname -s)
+            DOMAIN=$(hostname -d | cut -d. -f2-)
+            until getent hosts $HOST.$DOMAIN >/dev/null 2>&1; do
+                echo dns entry is not yet resolvable. waiting...
+                sleep 2
+            done
+            SERVICE_IP=$(getent hosts $HOST.$DOMAIN | awk '{ print $1 }')
+            mkdir -p /data/conf /data/db
+            sed -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
+                -e "s/\${USER_NAME}/$USER_NAME/g" \
+                -e "s/\${PASSWORD}/$PASSWORD/g" \
+                /configtmp/redis.conf > /tmp/redis.conf
+            mv /tmp/redis.conf /data/conf/redis.conf
+          fi
           exec "$@"
         - --
         args:
