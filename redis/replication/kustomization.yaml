@@ -1,0 +1,15 @@
+commonLabels:
+  app: redis
+  comp: server
+configMapGenerator:
+- name: redis
+  files:
+  - redis.conf
+secretGenerator:
+- name: redis
+  literals:
+  - USER_NAME=root
+  - PASSWORD=secret
+resources:
+- service.yaml
+- statefulset.yaml

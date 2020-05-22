@@ -1,0 +1,122 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: redis-headless
+spec:
+  publishNotReadyAddresses: true
+  clusterIP: None
+  ports:
+  - name: client
+    port: 6379
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+spec:
+  serviceName: redis-headless
+  replicas: 3
+  podManagementPolicy: Parallel
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ReadWriteOnce]
+      resources:
+        requests:
+          storage: 1Gi
+  template:
+    spec:
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
+        runAsNonRoot: true
+      volumes:
+      - name: config
+        configMap:
+          name: redis
+      containers:
+      - name: redis
+        image: redis:6.0.3
+        ports:
+        - name: client
+          containerPort: 6379
+        - name: bus
+          containerPort: 16379
+        envFrom:
+        - secretRef:
+            name: redis
+            optional: true
+        command:
+        - bash
+        - -c
+        - |
+          set -eo pipefail
+          HOST=$(hostname -s)
+          DOMAIN=$(hostname -d | cut -d. -f2-)
+          until getent hosts $HOST.$DOMAIN >/dev/null 2>&1; do
+              echo $HOST.$DOMAIN is not yet resolvable. waiting...
+              sleep 2
+          done
+          SERVICE_IP=$(getent hosts $HOST.$DOMAIN | awk '{ print $1 }')
+          mkdir -p /data/conf /data/db
+          cp /configtmp/redis.conf /data/conf/redis.conf
+          sed -i -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
+                 -e "s/\${USER_NAME}/$USER_NAME/g" \
+                 -e "s/\${PASSWORD}/$PASSWORD/g" /data/conf/redis.conf
+
+          if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
+              NAME=${BASH_REMATCH[1]}
+              ORD=${BASH_REMATCH[2]}
+          else
+              echo "Failed to parse hostname $HOST"
+              exit 1
+          fi
+          if [ "$ORD" != "0" ]; then
+              until getent hosts $NAME-0.$DOMAIN >/dev/null 2>&1; do
+                  echo $NAME-0.$DOMAIN is not yet resolvable. waiting...
+                  sleep 2
+              done
+              MASTER_IP=$(getent hosts $NAME-0.$DOMAIN | awk '{ print $1 }')
+              echo >> /data/conf/redis.conf
+              echo "replicaof ${MASTER_IP} 6379" >> /data/conf/redis.conf
+          fi
+
+          exec "$@"
+        - --
+        args:
+        - redis-server
+        - /data/conf/redis.conf
+        volumeMounts:
+        - name: config
+          mountPath: /configtmp
+        - name: datadir
+          mountPath: /data
+        readinessProbe:
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 5
+          exec:
+            command:
+            - bash
+            - -c
+            - |
+              set -e
+              if [ "$USER_NAME" != "" ]; then
+                  auth="--user ${USER_NAME} --pass ${PASSWORD}"
+              fi
+              test "$(redis-cli $auth ping)" == "PONG"
+        livenessProbe:
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 5
+          exec:
+            command:
+            - bash
+            - -c
+            - |
+              set -e
+              if [ "$USER_NAME" != "" ]; then
+                  auth="--user ${USER_NAME} --pass ${PASSWORD}"
+              fi
+              test "$(redis-cli $auth ping)" == "PONG"
