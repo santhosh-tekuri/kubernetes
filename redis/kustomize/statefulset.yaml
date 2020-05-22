@@ -54,13 +54,13 @@ spec:
         - -c
         - |
           set -eo pipefail
-          NAME=$(hostname -s)
-          DOMAIN=$(hostname -d | cut -c16-)
-          until getent hosts $NAME.$DOMAIN >/dev/null 2>&1; do
+          HOST=$(hostname -s)
+          DOMAIN=$(hostname -d | cut -d. -f2-)
+          until getent hosts $HOST.$DOMAIN >/dev/null 2>&1; do
               echo dns entry is not yet resolvable. waiting...
               sleep 2
           done
-          SERVICE_IP=$(getent hosts $NAME.$DOMAIN | awk '{ print $1 }')
+          SERVICE_IP=$(getent hosts $HOST.$DOMAIN | awk '{ print $1 }')
           mkdir -p /data/conf /data/db
           cp /configtmp/redis.conf /data/conf/redis.conf
           sed -i -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
