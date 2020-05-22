@@ -7,8 +7,8 @@ configMapGenerator:
 secretGenerator:
 - name: redis
   literals:
-  - USER_NAME=root
-  - PASSWORD=secret
+  - ROOT_USER=root
+  - ROOT_PASSWORD=secret
 resources:
 - service.yaml
 - statefulset.yaml

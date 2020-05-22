@@ -64,8 +64,8 @@ spec:
             SERVICE_IP=$(getent hosts $HOST.$DOMAIN | awk '{ print $1 }')
             mkdir -p /data/conf /data/db
             sed -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
-                -e "s/\${USER_NAME}/$USER_NAME/g" \
-                -e "s/\${PASSWORD}/$PASSWORD/g" \
+                -e "s/\${ROOT_USER}/$ROOT_USER/g" \
+                -e "s/\${ROOT_PASSWORD}/$ROOT_PASSWORD/g" \
                 /configtmp/redis.conf > /tmp/redis.conf
             mv /tmp/redis.conf /data/conf/redis.conf
           fi
@@ -89,8 +89,8 @@ spec:
             - -c
             - |
               set -e
-              if [ "$USER_NAME" != "" ]; then
-                  auth="--user ${USER_NAME} --pass ${PASSWORD}"
+              if [ "$ROOT_USER" != "" ]; then
+                  auth="--user ${ROOT_USER} --pass ${ROOT_PASSWORD}"
               fi
               test "$(redis-cli $auth ping)" == "PONG"
         livenessProbe:
@@ -103,7 +103,7 @@ spec:
             - -c
             - |
               set -e
-              if [ "$USER_NAME" != "" ]; then
-                  auth="--user ${USER_NAME} --pass ${PASSWORD}"
+              if [ "$ROOT_USER" != "" ]; then
+                  auth="--user ${ROOT_USER} --pass ${ROOT_PASSWORD}"
               fi
               test "$(redis-cli $auth ping)" == "PONG"

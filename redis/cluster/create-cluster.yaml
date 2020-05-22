@@ -23,8 +23,8 @@ spec:
         - -c
         - |
           set -eo pipefail
-          if [ "$USER_NAME" != "" ]; then
-              auth="--user ${USER_NAME} --pass ${PASSWORD}"
+          if [ "$ROOT_USER" != "" ]; then
+              auth="--user ${ROOT_USER} --pass ${ROOT_PASSWORD}"
           fi
           nodes=""
           for i in $(seq 0 $((STATEFULSET_REPLICAS-1))); do
