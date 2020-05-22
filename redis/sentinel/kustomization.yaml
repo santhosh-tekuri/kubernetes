@@ -1,16 +1,13 @@
 commonLabels:
   app: redis
-  comp: server
-generatorOptions:
-  disableNameSuffixHash: true
+  comp: sentinel
 configMapGenerator:
-- name: redis
+- name: sentinel
   files:
-  - redis.conf
+  - sentinel.conf
 secretGenerator:
-- name: redis
+- name: sentinel
   literals:
-  - USER_NAME=root
   - PASSWORD=secret
 resources:
 - service.yaml

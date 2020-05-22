@@ -1,0 +1,116 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: sentinel-headless
+spec:
+  publishNotReadyAddresses: true
+  clusterIP: None
+  ports:
+  - name: client
+    port: 26379
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sentinel
+spec:
+  serviceName: sentinel-headless
+  replicas: 3
+  podManagementPolicy: Parallel
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ReadWriteOnce]
+      resources:
+        requests:
+          storage: 50Ki
+  template:
+    spec:
+      securityContext:
+        runAsUser: 999
+        fsGroup: 999
+        runAsNonRoot: true
+      volumes:
+      - name: config
+        configMap:
+          name: sentinel
+      containers:
+      - name: sentinel
+        image: redis:6.0.3
+        ports:
+        - name: client
+          containerPort: 26379
+        envFrom:
+        - secretRef:
+            name: redis
+            optional: true
+          prefix: REDIS_
+        - secretRef:
+            name: sentinel
+            optional: true
+          prefix: SENTINEL_
+        command:
+        - bash
+        - -c
+        - |
+          set -eo pipefail
+          if [ ! -f /data/sentinel.conf ]; then
+              HOST=$(hostname -s)
+              DOMAIN=$(hostname -d | cut -d. -f2-)
+              until getent hosts $HOST.$DOMAIN >/dev/null 2>&1; do
+                  echo $HOST.$DOMAIN is not yet resolvable. waiting...
+                  sleep 2
+              done
+              SERVICE_IP=$(getent hosts $HOST.$DOMAIN | awk '{ print $1 }')
+              until getent hosts redis-0.$DOMAIN >/dev/null 2>&1; do
+                  echo redis-0.$DOMAIN is not yet resolvable. waiting...
+                  sleep 2
+              done
+              MASTER_IP=$(getent hosts redis-0.$DOMAIN | awk '{ print $1 }')
+              sed -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
+                  -e "s/\${MASTER_IP}/$MASTER_IP/g" \
+                  -e "s/\${REDIS_USER_NAME}/$REDIS_USER_NAME/g" \
+                  -e "s/\${REDIS_PASSWORD}/$REDIS_PASSWORD/g" \
+                  -e "s/\${SENTINEL_PASSWORD}/$SENTINEL_PASSWORD/g" \
+                  /configtmp/sentinel.conf > /tmp/sentinel.conf
+              mv /tmp/sentinel.conf /data/sentinel.conf
+          fi
+          exec "$@"
+        - --
+        args:
+        - redis-sentinel
+        - /data/sentinel.conf
+        volumeMounts:
+        - name: config
+          mountPath: /configtmp
+        - name: datadir
+          mountPath: /data
+        readinessProbe:
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 5
+          exec:
+            command:
+            - bash
+            - -c
+            - |
+              set -e
+              if [ "$SENTINEL_PASSWORD" != "" ]; then
+                  auth="--pass ${SENTINEL_PASSWORD}"
+              fi
+              test "$(redis-cli -p 26379 $auth ping)" == "PONG"
+        livenessProbe:
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 5
+          exec:
+            command:
+            - bash
+            - -c
+            - |
+              set -e
+              if [ "$SENTINEL_PASSWORD" != "" ]; then
+                  auth="--pass ${SENTINEL_PASSWORD}"
+              fi
+              test "$(redis-cli -p 26379 $auth ping)" == "PONG"
