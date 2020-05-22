@@ -47,6 +47,8 @@ spec:
         env:
         - name: REPLICAS
           value: "3" # should match Statefulset.spec.replicas
+        - name: REPLSET
+          value: "rs0"
         envFrom:
         - secretRef:
             name: mongodb
@@ -66,7 +68,7 @@ spec:
         - mongod
         - --config=/etc/mongod.conf
         - --keyFile=/etc/mongoauth/keyfile
-        - --replSet=rs0
+        - --replSet=$(REPLSET)
         lifecycle:
           postStart:
             exec:
@@ -110,7 +112,7 @@ spec:
 
                 print("initiating replicaSet...")
                 resp = rs.initiate({
-                    _id: "rs0",
+                    _id: "${REPLSET}",
                     members: [
                         { _id: 0, host: "$NAME-0.$DOMAIN" }
                     ]
