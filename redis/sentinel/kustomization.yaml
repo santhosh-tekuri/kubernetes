@@ -9,8 +9,8 @@ secretGenerator:
 - name: sentinel
   literals:
   - SENTINEL_PASSWORD=secret
-  - REDIS_USER=root
-  - REDIS_PASSWORD=secret
+  - REDIS_USER=sentinel
+  - REDIS_PASSWORD=U6FP4PBA0r
 resources:
 - service.yaml
 - statefulset.yaml

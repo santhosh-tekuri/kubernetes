@@ -65,7 +65,7 @@ spec:
               MASTER_IP=$(getent hosts redis-0.$DOMAIN | awk '{ print $1 }')
               sed -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
                   -e "s/\${MASTER_IP}/$MASTER_IP/g" \
-                  -e "s/\${REDIS_USER_NAME}/$REDIS_USER_NAME/g" \
+                  -e "s/\${REDIS_USER}/$REDIS_USER/g" \
                   -e "s/\${REDIS_PASSWORD}/$REDIS_PASSWORD/g" \
                   -e "s/\${SENTINEL_PASSWORD}/$SENTINEL_PASSWORD/g" \
                   /configtmp/sentinel.conf > /tmp/sentinel.conf

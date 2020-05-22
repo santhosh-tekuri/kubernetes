@@ -10,6 +10,8 @@ secretGenerator:
   literals:
   - ROOT_USER=root
   - ROOT_PASSWORD=secret
+  - SENTINEL_USER=sentinel
+  - SENTINEL_PASSWORD=U6FP4PBA0r
 resources:
 - service.yaml
 - statefulset.yaml

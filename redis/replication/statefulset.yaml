@@ -64,6 +64,8 @@ spec:
               sed -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
                   -e "s/\${ROOT_USER}/$ROOT_USER/g" \
                   -e "s/\${ROOT_PASSWORD}/$ROOT_PASSWORD/g" \
+                  -e "s/\${SENTINEL_USER}/$SENTINEL_USER/g" \
+                  -e "s/\${SENTINEL_PASSWORD}/$SENTINEL_PASSWORD/g" \
                   /configtmp/redis.conf > /tmp/redis.conf
 
               if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
