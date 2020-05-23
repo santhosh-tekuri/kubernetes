@@ -96,7 +96,7 @@ spec:
                 # wait until servers are ready
                 for i in $(seq 0 $((REPLICAS-1))); do
                     until mongo --host "$NAME-$i.$DOMAIN" --eval quit > /dev/null 2>&1; do
-                        echo "replica $i not ready yet"
+                        echo "$NAME-$i not ready yet. waiting..."
                         sleep 5
                     done
                 done
@@ -122,7 +122,7 @@ spec:
                     quit(2)
                 }
                 while(rs.status().members[0].stateStr!="PRIMARY"){
-                    print("waiting to become primary...")
+                    print("$HOST is not yet become primary. waiting...")
                     sleep(2000)
                 }
                 if("$ROOT_PASSWORD"!="") {
