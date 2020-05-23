@@ -2,13 +2,13 @@
 
 creates redis cluster of 3 masters each with 1 replica
 
-- the statefulset creates `6` replicas
+- the statefulset creates `6` redis servers
 - redis does not yet support dns names, it needs stable-ips
-  - for each replica there is a service defined for stable-ip
+  - for each redis server, there is a service defined for stable-ip
   - in `redis.conf`, `${SERVICE_IP}` is replaced during startup
 - authentication is enabled
-  - `USER_NAME` and `PASSWORD` specified in secret
-  - in `redis.conf`, `${USER_NAME}` and `${PASSWORD}` are replaced during startup
+  - `ROOT_USER` and `ROOT_PASSWORD` specified in secret
+  - in `redis.conf`, `${ROOT_USER}` and `${ROOT_PASSWORD}` are replaced during startup
   - `default` user is disabled in `redis.conf`
 - startup generates `redis.conf` with the above placeholders replaced
 - configuration `/data/conf/redis.conf` is stored in persistent volme
