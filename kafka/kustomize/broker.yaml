@@ -105,9 +105,8 @@ spec:
           value: -Xmx512M -Xms512M
         command:
         - bash
-        - -c
+        - -ce
         - |
-          set -e
           HOST=$(hostname -s)
           DOMAIN=$(hostname -d)
           if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then

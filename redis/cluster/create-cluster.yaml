@@ -20,9 +20,9 @@ spec:
             optional: true
         command:
         - bash
-        - -c
+        - -ce
         - |
-          set -eo pipefail
+          set -o pipefail
           if [ "$ROOT_USER" != "" ]; then
               auth="--user ${ROOT_USER} --pass ${ROOT_PASSWORD}"
           fi

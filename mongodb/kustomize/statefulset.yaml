@@ -55,9 +55,8 @@ spec:
             optional: true
         command:
         - bash
-        - -c
+        - -ce
         - |
-          set -e
           if [ -n "$keyfile" -a ! -f /etc/mongoauth/keyfile ]; then
               printenv keyfile > /etc/mongoauth/keyfile
               chmod 400 /etc/mongoauth/keyfile
@@ -74,10 +73,8 @@ spec:
             exec:
               command:
               - bash
-              - -c
+              - -ce
               - |
-                set -e
-
                 HOST=$(hostname -s)
                 DOMAIN=$(hostname -d)
                 if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then

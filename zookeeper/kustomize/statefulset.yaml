@@ -78,9 +78,8 @@ spec:
           value: "1024" # jvm heapsize in mb
         command:
         - bash
-        - -c
+        - -ce
         - |
-          set -ex
           HOST=$(hostname -s)
           DOMAIN=$(hostname -d)
           if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
@@ -117,8 +116,7 @@ spec:
           exec:
             command:
             - bash
-            - -c
+            - -ce
             - |
-              set -e
               resp=$(echo ruok | nc 127.0.0.1 2181)
               test "$resp" == "imok"

@@ -51,9 +51,9 @@ spec:
             optional: true
         command:
         - bash
-        - -c
+        - -ce
         - |
-          set -eo pipefail
+          set -o pipefail
           if [ ! -f /data/conf/redis.conf ]; then
             HOST=$(hostname -s)
             DOMAIN=$(hostname -d | cut -d. -f2-)
@@ -86,9 +86,8 @@ spec:
           exec:
             command:
             - bash
-            - -c
+            - -ce
             - |
-              set -e
               if [ "$ROOT_USER" != "" ]; then
                   auth="--user ${ROOT_USER} --pass ${ROOT_PASSWORD}"
               fi
@@ -100,9 +99,8 @@ spec:
           exec:
             command:
             - bash
-            - -c
+            - -ce
             - |
-              set -e
               if [ "$ROOT_USER" != "" ]; then
                   auth="--user ${ROOT_USER} --pass ${ROOT_PASSWORD}"
               fi
