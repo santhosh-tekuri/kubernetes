@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq-headless
+spec:
+  clusterIP: None
+  ports:
+  - name: epmd
+    port: 4369
+  - name: amqp
+    port: 5672
+  - name: dist
+    port: 25672
+  - name: http
+    port: 15672
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: rabbitmq
+spec:
+  serviceName: rabbitmq-headless
+  podManagementPolicy: OrderedReady # should be OrderedReady
+  replicas: 3
+  volumeClaimTemplates:
+  - metadata:
+      name: datadir
+    spec:
+      accessModes: [ReadWriteOnce]
+      resources:
+        requests:
+          storage: 8Gi
+  template:
+    spec:
+      serviceAccountName: rabbitmq
+      terminationGracePeriodSeconds: 10
+      securityContext:
+        fsGroup: 999
+        runAsUser: 999
+      volumes:
+      - name: config
+        configMap:
+          name: rabbitmq
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.8.3
+        ports:
+        - name: epmd
+          containerPort: 4369
+        - name: amqp
+          containerPort: 5672
+        - name: dist
+          containerPort: 25672
+        - name: http
+          containerPort: 15672
+        env:
+        - name: RABBITMQ_USE_LONGNAME
+          value: "true"
+        envFrom:
+        - secretRef:
+            name: rabbitmq
+        command:
+        - bash
+        - -ec
+        - |
+          cp /configtmp/* /etc/rabbitmq
+          printenv erlang_cookie > /var/lib/rabbitmq/.erlang.cookie
+          chmod 600 /var/lib/rabbitmq/.erlang.cookie
+          export RABBITMQ_NODENAME=rabbit@$(hostname -f)
+          export K8S_SERVICE_NAME=$(hostname -f | cut -d. -f2)
+          export K8S_HOSTNAME_SUFFIX=.$(hostname -d)
+          exec "$@"
+        - --
+        args:
+        - rabbitmq-server
+        volumeMounts:
+        - name: config
+          mountPath: /configtmp
+        - name: datadir
+          mountPath: /var/lib/rabbitmq

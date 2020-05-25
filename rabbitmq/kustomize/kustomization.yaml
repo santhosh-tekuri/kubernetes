@@ -1,0 +1,14 @@
+commonLabels:
+  app: rabbitmq
+configMapGenerator:
+- name: rabbitmq
+  files:
+  - enabled_plugins
+  - rabbitmq.conf
+secretGenerator:
+- name: rabbitmq
+  literals:
+  - erlang_cookie=ZdzbbRz8jI8i0GMZBJTBvDxpSMzzNa1rVJtzfh2uUNduSoT5CAbZc61kWuWFlnFx
+resources:
+- rbac.yaml
+- statefulset.yaml
