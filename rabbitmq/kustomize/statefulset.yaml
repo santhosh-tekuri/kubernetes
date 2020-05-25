@@ -78,3 +78,15 @@ spec:
           mountPath: /configtmp
         - name: datadir
           mountPath: /var/lib/rabbitmq
+        readinessProbe:
+          initialDelaySeconds: 10
+          timeoutSeconds: 20
+          periodSeconds: 30
+          exec:
+            command: [rabbitmq-diagnostics, -q, status]
+        livenessProbe:
+          initialDelaySeconds: 10
+          timeoutSeconds: 20
+          periodSeconds: 30
+          exec:
+            command: [rabbitmq-diagnostics, -q, status]
