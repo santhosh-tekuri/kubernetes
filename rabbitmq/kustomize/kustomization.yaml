@@ -12,3 +12,4 @@ secretGenerator:
 resources:
 - rbac.yaml
 - statefulset.yaml
+- service.yaml
