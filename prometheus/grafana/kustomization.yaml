@@ -1,11 +1,11 @@
-namespace: kube-system
+namespace: prometheus
 commonLabels:
   app: grafana
 configMapGenerator:
-  - name: grafana
-    files:
-    - grafana.ini
-    - datasources.yaml
+- name: grafana
+  files:
+  - grafana.ini
+  - datasources.yaml
 secretGenerator:
 - name: grafana
   literals:
