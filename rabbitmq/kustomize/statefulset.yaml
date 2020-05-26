@@ -64,6 +64,9 @@ spec:
         - -ce
         - |
           cp /configtmp/* /etc/rabbitmq
+          sed -i -e "s/\${default_user}/${default_user}/g" \
+                 -e "s/\${default_pass}/${default_pass}/g" \
+                 /etc/rabbitmq/rabbitmq.conf
           printenv erlang_cookie > /var/lib/rabbitmq/.erlang.cookie
           chmod 600 /var/lib/rabbitmq/.erlang.cookie
           export RABBITMQ_NODENAME=rabbit@$(hostname -f)
