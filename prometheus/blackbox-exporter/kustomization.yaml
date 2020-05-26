@@ -7,4 +7,5 @@ configMapGenerator:
   files:
   - blackbox.yml
 resources:
-- blackbox-exporter.yaml
+- deployment.yaml
+- service.yaml
