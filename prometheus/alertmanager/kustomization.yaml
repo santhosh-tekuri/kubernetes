@@ -1,0 +1,10 @@
+namespace: kube-system
+commonLabels:
+  app: prometheus
+  comp: alertmanager
+configMapGenerator:
+- name: prometheus-alertmanager
+  files:
+  - alertmanager.yml
+resources:
+- alertmanager.yaml
