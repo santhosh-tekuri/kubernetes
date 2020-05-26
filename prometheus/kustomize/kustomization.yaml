@@ -7,11 +7,7 @@ configMapGenerator:
   - prometheus.yml
   - recording_rules.yml
   - alerting_rules.yml
-- name: prometheus-blackbox-exporter
-  files:
-  - blackbox.yml
 resources:
-- blackbox-exporter.yaml
 - node-exporter.yaml
 - kube-scheduler.yaml
 - prometheus.yaml

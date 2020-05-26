@@ -1,0 +1,10 @@
+namespace: kube-system
+commonLabels:
+  app: prometheus
+  comp: blackbox-exporter
+configMapGenerator:
+- name: prometheus-blackbox-exporter
+  files:
+  - blackbox.yml
+resources:
+- blackbox-exporter.yaml
