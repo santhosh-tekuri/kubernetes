@@ -3,4 +3,4 @@ commonLabels:
   app: prometheus
   comp: node-exporter
 resources:
-- node-exporter.yaml
+- daemonset.yaml
