@@ -7,4 +7,5 @@ configMapGenerator:
   files:
   - alertmanager.yml
 resources:
-- alertmanager.yaml
+- statefulset.yaml
+- service.yaml
