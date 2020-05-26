@@ -2,15 +2,11 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: prometheus-server
-  labels:
-    comp: server
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: prometheus-server
-  labels:
-    comp: server
 rules:
 - apiGroups: [""]
   resources: ["nodes", "nodes/proxy", "nodes/metrics", "services", "endpoints", "pods", "ingresses", "configmaps"]
@@ -25,8 +21,6 @@ apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRoleBinding
 metadata:
   name: prometheus-server
-  labels:
-    comp: server
 subjects:
 - kind: ServiceAccount
   name: prometheus-server
@@ -40,11 +34,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus-server
-  labels:
-    comp: server
 spec:
-  selector:
-    comp: server
   ports:
   - name: http
     port: 9090
@@ -57,8 +47,6 @@ metadata:
     comp: server
 spec:
   clusterIP: None
-  selector:
-    comp: server
   ports:
   - name: http
     port: 9090
@@ -67,14 +55,9 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: prometheus-server
-  labels:
-    comp: server
 spec:
   serviceName: prometheus-server-headless
   replicas: 1
-  selector:
-    matchLabels:
-      comp: server
   volumeClaimTemplates:
   - metadata:
       name: datadir
@@ -84,9 +67,6 @@ spec:
         requests:
           storage: 8Gi
   template:
-    metadata:
-      labels:
-        comp: server
     spec:
       terminationGracePeriodSeconds: 300
       securityContext:

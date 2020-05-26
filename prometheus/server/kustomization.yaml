@@ -1,6 +1,7 @@
 namespace: kube-system # should match the namespace in prometheus.yml/alerting.alertmanagers.relabel_configs.regex
 commonLabels:
   app: prometheus
+  comp: server
 configMapGenerator:
 - name: prometheus-server
   files:
@@ -8,5 +9,4 @@ configMapGenerator:
   - recording_rules.yml
   - alerting_rules.yml
 resources:
-- kube-scheduler.yaml
 - prometheus.yaml
