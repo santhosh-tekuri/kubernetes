@@ -6,6 +6,7 @@ configMapGenerator:
   files:
   - grafana.ini
   - datasources.yaml
+  - dashboardproviders.yaml
 secretGenerator:
 - name: grafana
   literals:
