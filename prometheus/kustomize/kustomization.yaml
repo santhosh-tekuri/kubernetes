@@ -18,4 +18,4 @@ resources:
 - blackbox-exporter.yaml
 - node-exporter.yaml
 - kube-scheduler.yaml
-- server.yaml
+- prometheus.yaml
