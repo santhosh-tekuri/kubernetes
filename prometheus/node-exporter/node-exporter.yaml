@@ -2,18 +2,10 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: prometheus-node-exporter
-  labels:
-    comp: node-exporter
 spec:
-  selector:
-    matchLabels:
-      comp: node-exporter
   updateStrategy:
     type: RollingUpdate
   template:
-    metadata:
-      labels:
-        comp: node-exporter
     spec:
       tolerations:
       - key: node-role.kubernetes.io/master

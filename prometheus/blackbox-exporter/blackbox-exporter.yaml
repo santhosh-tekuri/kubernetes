@@ -2,11 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus-blackbox-exporter
-  labels:
-    comp: blackbox-exporter
 spec:
-  selector:
-    comp: blackbox-exporter
   ports:
   - name: http
     port: 9115
@@ -15,22 +11,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus-blackbox-exporter
-  labels:
-    comp: blackbox-exporter
 spec:
   replicas: 1
-  selector:
-    matchLabels:
-      comp: blackbox-exporter
   strategy:
     type: RollingUpdate
     rollingUpdate:
       maxSurge: 1
       maxUnavailable: 0
   template:
-    metadata:
-      labels:
-        comp: blackbox-exporter
     spec:
       restartPolicy: Always
       volumes:
