@@ -9,4 +9,6 @@ configMapGenerator:
   - recording_rules.yml
   - alerting_rules.yml
 resources:
-- prometheus.yaml
+- rbac.yaml
+- statefulset.yaml
+- service.yaml
