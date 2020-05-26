@@ -1,4 +1,4 @@
-namespace: kube-system
+namespace: prometheus
 commonLabels:
   app: prometheus
   comp: node-exporter

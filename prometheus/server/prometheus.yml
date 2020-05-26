@@ -15,9 +15,6 @@ alerting:
   - kubernetes_sd_configs:
     - role: pod
     relabel_configs:
-    - source_labels: [__meta_kubernetes_namespace]
-      regex: kube-system
-      action: keep
     - source_labels: [__meta_kubernetes_pod_label_app]
       regex: prometheus
       action: keep
@@ -92,16 +89,16 @@ scrape_configs:
   kubernetes_sd_configs:
   - role: service
   relabel_configs:
-  - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_label_app]
-    regex: kube-system;kube-state-metrics
+  - source_labels: [__meta_kubernetes_service_label_app]
+    regex: kube-state-metrics
     action: keep
 
 - job_name: node-exporter
   kubernetes_sd_configs:
   - role: pod
   relabel_configs:
-  - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_pod_label_app,__meta_kubernetes_pod_label_comp]
-    regex: kube-system;prometheus;node-exporter
+  - source_labels: [__meta_kubernetes_pod_label_app,__meta_kubernetes_pod_label_comp]
+    regex: prometheus;node-exporter
     action: keep
   - source_labels: [__meta_kubernetes_pod_node_name]
     target_label: instance

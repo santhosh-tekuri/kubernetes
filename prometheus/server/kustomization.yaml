@@ -1,4 +1,4 @@
-namespace: kube-system # should match the namespace in prometheus.yml/alerting.alertmanagers.relabel_configs.regex
+namespace: prometheus
 commonLabels:
   app: prometheus
   comp: server

@@ -1,4 +1,4 @@
-namespace: kube-system
+namespace: prometheus
 commonLabels:
   app: kube-state-metrics
 resources:
