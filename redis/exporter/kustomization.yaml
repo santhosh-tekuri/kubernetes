@@ -1,0 +1,13 @@
+commonLabels:
+  app: redis-exporter
+configMapGenerator:
+- name: redis-exporter
+  literals:
+  - REDIS_EXPORTER_LOG_FORMAT=json
+secretGenerator:
+- name: redis-exporter
+  literals:
+  - REDIS_PASSWORD=secret
+resources:
+- deployment.yaml
+- service.yaml
