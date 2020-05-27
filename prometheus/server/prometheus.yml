@@ -216,3 +216,19 @@ scrape_configs:
   - source_labels: [__meta_kubernetes_pod_name]
     action: replace
     target_label: kubernetes_pod_name
+
+- job_name: redis
+  metrics_path: /scrape
+  kubernetes_sd_configs:
+    - role: pod
+  relabel_configs:
+  - source_labels: [__meta_kubernetes_pod_label_app, __meta_kubernetes_pod_label_comp, __meta_kubernetes_pod_container_port_name]
+    regex: redis;server;client
+    action: keep
+  - source_labels: [__address__]
+    target_label: __param_target
+  - source_labels: [__param_target]
+    target_label: instance
+  - source_labels: [__meta_kubernetes_namespace]
+    target_label: __address__
+    replacement: redis-exporter.$1.svc.cluster.local:9121
