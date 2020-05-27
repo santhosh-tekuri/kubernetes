@@ -15,14 +15,8 @@ alerting:
   - kubernetes_sd_configs:
     - role: pod
     relabel_configs:
-    - source_labels: [__meta_kubernetes_pod_label_app]
-      regex: prometheus
-      action: keep
-    - source_labels: [__meta_kubernetes_pod_label_comp]
-      regex: alertmanager
-      action: keep
-    - source_labels: [__meta_kubernetes_pod_container_port_name]
-      regex: http
+    - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_pod_label_app, __meta_kubernetes_pod_container_port_name]
+      regex: monitoring;alertmanager;http
       action: keep
 
 
@@ -89,16 +83,16 @@ scrape_configs:
   kubernetes_sd_configs:
   - role: service
   relabel_configs:
-  - source_labels: [__meta_kubernetes_service_label_app]
-    regex: kube-state-metrics
+  - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_label_app]
+    regex: monitoring;kube-state-metrics
     action: keep
 
 - job_name: node-exporter
   kubernetes_sd_configs:
   - role: pod
   relabel_configs:
-  - source_labels: [__meta_kubernetes_pod_label_app,__meta_kubernetes_pod_label_comp]
-    regex: prometheus;node-exporter
+  - source_labels: [__meta_kubernetes_pod_label_app]
+    regex: node-exporter
     action: keep
   - source_labels: [__meta_kubernetes_pod_node_name]
     target_label: instance
@@ -163,7 +157,7 @@ scrape_configs:
   - source_labels: [__address__]
     target_label: __param_target
   - target_label: __address__
-    replacement: blackbox:9115
+    replacement: blackbox-exporter:9115
   - source_labels: [__param_target]
     target_label: instance
   - action: labelmap
@@ -188,7 +182,7 @@ scrape_configs:
     replacement: ${1}://${2}${3}
     target_label: __param_target
   - target_label: __address__
-    replacement: blackbox:9115
+    replacement: blackbox-exporter:9115
   - source_labels: [__param_target]
     target_label: instance
   - action: labelmap

@@ -1,9 +1,8 @@
-namespace: prometheus
+namespace: monitoring
 commonLabels:
-  app: prometheus
-  comp: blackbox-exporter
+  app: blackbox-exporter
 configMapGenerator:
-- name: prometheus-blackbox-exporter
+- name: blackbox-exporter
   files:
   - blackbox.yml
 resources:

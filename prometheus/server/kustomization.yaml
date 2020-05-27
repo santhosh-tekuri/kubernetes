@@ -1,9 +1,8 @@
-namespace: prometheus
+namespace: monitoring
 commonLabels:
   app: prometheus
-  comp: server
 configMapGenerator:
-- name: prometheus-server
+- name: prometheus
   files:
   - prometheus.yml
   - recording_rules.yml

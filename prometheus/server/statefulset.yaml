@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus-server-headless
+  name: prometheus-headless
 spec:
   clusterIP: None
   ports:
@@ -11,9 +11,9 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: prometheus-server
+  name: prometheus
 spec:
-  serviceName: prometheus-server-headless
+  serviceName: prometheus-headless
   replicas: 1
   volumeClaimTemplates:
   - metadata:
@@ -26,17 +26,17 @@ spec:
   template:
     spec:
       terminationGracePeriodSeconds: 300
+      serviceAccountName: prometheus
       securityContext:
         fsGroup: 65534
         runAsGroup: 65534
         runAsUser: 65534
-      serviceAccountName: prometheus-server
       volumes:
       - name: config
         configMap:
-          name: prometheus-server
+          name: prometheus
       containers:
-      - name: server
+      - name: prometheus
         image: prom/prometheus:v2.18.0
         ports:
         - name: http

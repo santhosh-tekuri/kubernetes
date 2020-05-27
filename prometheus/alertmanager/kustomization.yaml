@@ -1,9 +1,8 @@
-namespace: prometheus
+namespace: monitoring
 commonLabels:
-  app: prometheus
-  comp: alertmanager
+  app: alertmanager
 configMapGenerator:
-- name: prometheus-alertmanager
+- name: alertmanager
   files:
   - alertmanager.yml
 resources:

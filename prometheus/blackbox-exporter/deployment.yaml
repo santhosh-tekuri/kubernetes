@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: prometheus-blackbox-exporter
+  name: blackbox-exporter
 spec:
   replicas: 1
   strategy:
@@ -15,7 +15,7 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: prometheus-blackbox-exporter
+          name: blackbox-exporter
       containers:
       - name: blackbox-exporter
         image: prom/blackbox-exporter:v0.16.0

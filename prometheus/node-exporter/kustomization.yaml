@@ -1,6 +1,5 @@
-namespace: prometheus
+namespace: monitoring
 commonLabels:
-  app: prometheus
-  comp: node-exporter
+  app: node-exporter
 resources:
 - daemonset.yaml

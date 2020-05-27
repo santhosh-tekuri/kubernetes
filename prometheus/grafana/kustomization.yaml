@@ -1,4 +1,4 @@
-namespace: prometheus
+namespace: monitoring
 commonLabels:
   app: grafana
 configMapGenerator:

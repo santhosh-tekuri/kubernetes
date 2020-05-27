@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: prometheus-node-exporter
+  name: node-exporter
 spec:
   updateStrategy:
     type: RollingUpdate
@@ -20,7 +20,7 @@ spec:
         hostPath:
           path: /sys
       containers:
-      - name: prometheus-node-exporter
+      - name: node-exporter
         image: prom/node-exporter:v0.18.1
         args:
         - --path.procfs=/host/proc

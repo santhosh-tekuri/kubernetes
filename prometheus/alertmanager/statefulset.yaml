@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: prometheus-alertmanager-headless
+  name: alertmanager-headless
 spec:
   clusterIP: None
   ports:
@@ -11,9 +11,9 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: prometheus-alertmanager
+  name: alertmanager
 spec:
-  serviceName: prometheus-alertmanager-headless
+  serviceName: alertmanager-headless
   replicas: 1
   podManagementPolicy: Parallel
   volumeClaimTemplates:
@@ -34,9 +34,9 @@ spec:
       volumes:
       - name: config
         configMap:
-          name: prometheus-alertmanager
+          name: alertmanager
       containers:
-      - name: prometheus-alertmanager
+      - name: alertmanager
         image: prom/alertmanager:v0.20.0
         ports:
         - name: http
