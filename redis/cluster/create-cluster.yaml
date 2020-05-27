@@ -23,8 +23,8 @@ spec:
         - -ce
         - |
           set -o pipefail
-          if [ "$ROOT_USER" != "" ]; then
-              auth="--user ${ROOT_USER} --pass ${ROOT_PASSWORD}"
+          if [ "$REDIS_PASSWORD" != "" ]; then
+              auth="--pass ${REDIS_PASSWORD}"
           fi
           nodes=""
           for i in $(seq 0 $((STATEFULSET_REPLICAS-1))); do

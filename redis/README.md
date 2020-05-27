@@ -7,8 +7,8 @@ creates redis cluster of 3 masters each with 1 replica
   - for each redis server, there is a service defined for stable-ip
   - in `redis.conf`, `${SERVICE_IP}` is replaced during startup
 - authentication is enabled
-  - `ROOT_USER` and `ROOT_PASSWORD` specified in secret
-  - in `redis.conf`, `${ROOT_USER}` and `${ROOT_PASSWORD}` are replaced during startup
+  - `REDIS_PASSWORD` specified in secret
+  - in `redis.conf`, `${REDIS_PASSWORD}` are replaced during startup
   - `default` user is disabled in `redis.conf`
 - startup generates `redis.conf` with the above placeholders replaced
 - configuration `/data/conf/redis.conf` is stored in persistent volme
