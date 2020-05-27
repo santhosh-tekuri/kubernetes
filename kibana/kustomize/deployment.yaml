@@ -37,9 +37,8 @@ spec:
           exec:
             command:
             - bash
-            - -c
+            - -ce
             - |
-              set -e
               http() {
                   local path="${1}"
                   set -- -XGET -s --fail -L
