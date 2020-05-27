@@ -1,5 +1,6 @@
 commonLabels:
   app: redis
+  comp: server
 configMapGenerator:
 - name: redis
   files:
