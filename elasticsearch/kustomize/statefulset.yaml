@@ -67,6 +67,10 @@ spec:
           containerPort: 9200
         - name: transport
           containerPort: 9300
+        envFrom:
+        - secretRef:
+            name: es
+            optional: true
         env:
         - name: node.name
           valueFrom:
@@ -82,8 +86,6 @@ spec:
           value: -Xmx1g -Xms1g
         - name: xpack.security.enabled
           value: "true"
-        - name: ELASTIC_PASSWORD
-          value: secret
         volumeMounts:
         - name: datadir
           mountPath: /usr/share/elasticsearch/data

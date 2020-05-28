@@ -1,5 +1,9 @@
 commonLabels:
   app: es
+secretGenerator:
+- name: es
+  literals:
+  - ELASTIC_PASSWORD=secret
 resources:
 - statefulset.yaml
 - service.yaml
