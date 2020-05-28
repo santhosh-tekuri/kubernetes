@@ -8,3 +8,4 @@ creates 3 node cluster, with each node as all possible types
   - update `PodDisruptionBudget.minAvailable` accordingly
 - use env `ES_JAVA_OPTS` to set jvm heap size
 - node discovery is done using headless service
+- password for user `elastic` is specified in secret param `ELASTIC_PASSWORD`
