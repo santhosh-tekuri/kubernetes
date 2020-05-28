@@ -1,5 +1,10 @@
 commonLabels:
   app: kibana
+secretGenerator:
+- name: kibana
+  literals:
+  - ELASTICSEARCH_USERNAME=elastic
+  - ELASTICSEARCH_PASSWORD=secret
 resources:
 - deployment.yaml
 - service.yaml
