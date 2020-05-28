@@ -80,6 +80,10 @@ spec:
           value: es-headless
         - name: ES_JAVA_OPTS
           value: -Xmx1g -Xms1g
+        - name: xpack.security.enabled
+          value: "true"
+        - name: ELASTIC_PASSWORD
+          value: secret
         volumeMounts:
         - name: datadir
           mountPath: /usr/share/elasticsearch/data
@@ -99,6 +103,7 @@ spec:
               # If the node is starting up wait for the cluster to be ready (request params: 'wait_for_status=green&timeout=1s' )
               # Once it has started only check that the node itself is responding
               START_FILE=/tmp/.es_start_file
+              ELASTIC_USERNAME=elastic
 
               if [ -n "${ELASTIC_USERNAME}" ] && [ -n "${ELASTIC_PASSWORD}" ]; then
                 BASIC_AUTH="-u ${ELASTIC_USERNAME}:${ELASTIC_PASSWORD}"
