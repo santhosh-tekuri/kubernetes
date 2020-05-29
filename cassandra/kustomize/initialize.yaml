@@ -1,13 +1,17 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: cassandra-change-password
+  name: cassandra-initialize
 spec:
   template:
     spec:
       restartPolicy: Never
+      volumes:
+      - name: config
+        configMap:
+          name: cassandra
       containers:
-      - name: cassandra-change-password
+      - name: init
         image: cassandra:3.11.6
         env:
         - name: REPLICAS
@@ -35,4 +39,11 @@ spec:
               ALTER KEYSPACE system_auth WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor': $REPLICAS };
               ALTER USER cassandra WITH PASSWORD '$CASSANDRA_PASSWORD';
           EOF
+          echo changing password...
           cqlsh -u cassandra -p cassandra -f /tmp/auth.sql cassandra
+          echo running initialize.cql...
+          cqlsh -u cassandra -p "$CASSANDRA_PASSWORD" -f /initialize.cql cassandra
+        volumeMounts:
+        - name: config
+          mountPath: /initialize.cql
+          subPath: initialize.cql

@@ -25,8 +25,10 @@ creates a cluster of 3 nodes
   - `AUTHENTICATOR` is set to `PasswordAuthenticator`
   - `AUTHORIZER` is set to `CassandraAuthorizer`
   - password for user `cassandra` is specified in secret
-  - job `change-password.yaml` changes the password
+  - job `initialize.yaml` changes the password
     - waits for cluster ready using env `REPLICAS`
 - jvm settings
   - `MAX_HEAP_SIZE` is set to `2048M`
   - `HEAP_NEWSIZE` is set to `512M`
+- `initialize.cql` can be used to create keyspaces and table on startup
+  - this file is executed by job `initialize.yaml`
