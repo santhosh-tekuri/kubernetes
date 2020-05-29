@@ -1,0 +1,32 @@
+# cassandra:3.11.6
+
+creates a cluster of 3 nodes
+- `/etc/cassandra/` contains configuration
+- `/var/lib/cassandra/` contains data
+- following environment variables are replaced in `cassandra.yaml`
+  - `STATEFULSET_NAME`: initialized by entry-point
+    - used to set `cluster_name`
+  - `POD_IP`: injected by kubernetes
+    - used to set `listen_address`, `broadcast_rpc_address`
+  - `NUM_TOKENS`: defaults to `256`
+  - `SEEDS`: initialized by entry-point using env `REPLICAS`
+  - `ENDPOINT_SNITCH`: defaults to `SimpleSnitch`
+  - `START_RPC`: defaults to `false`
+  - `RPC_ADDRESS`: defaults to `localhost`
+  - `AUTHENTICATOR`: defaults to `AllowAllAuthenticator`
+  - `AUTHORIZER`: defaults to `AllowAllAuthorizer`
+- following environment variables are replaced in `cassandra-rackdc.properties`
+  - `DATACENTER`: defaults to `dc1`
+  - `RACK`: defaults to `rack1`
+- cql is available to remote clients
+  - `START_RPC` is set to `true`
+  - `RPC_ADDRESS` is set to `0.0.0.0`
+- authentication
+  - `AUTHENTICATOR` is set to `PasswordAuthenticator`
+  - `AUTHORIZER` is set to `CassandraAuthorizer`
+  - password for user `cassandra` is specified in secret
+  - job `change-password.yaml` changes the password
+    - waits for cluster ready using env `REPLICAS`
+- jvm settings
+  - `MAX_HEAP_SIZE` is set to `2048M`
+  - `HEAP_NEWSIZE` is set to `512M`
