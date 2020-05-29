@@ -58,8 +58,10 @@ spec:
           value: 2048M
         - name: HEAP_NEWSIZE
           value: 512M
-        - name: CASSANDRA_START_RPC
-          value: "false"
+        - name: AUTHENTICATOR
+          value: PasswordAuthenticator
+        - name: AUTHORIZER
+          value: CassandraAuthorizer
         ports:
         - name: intra
           containerPort: 7000
@@ -100,6 +102,8 @@ spec:
                  -e "s/\${SEEDS}/${SEEDS}/g" \
                  -e "s/\${ENDPOINT_SNITCH}/${ENDPOINT_SNITCH:-SimpleSnitch}/g" \
                  -e "s/\${START_RPC}/${START_RPC:-false}/g" \
+                 -e "s/\${AUTHENTICATOR}/${AUTHENTICATOR:-AllowAllAuthenticator}/g" \
+                 -e "s/\${AUTHORIZER}/${AUTHORIZER:-AllowAllAuthorizer}/g" \
                  /etc/cassandra/cassandra.yaml
           sed -i -e "s/\${DATACENTER}/${DATACENTER:-dc1}/g" \
                  -e "s/\${RACK}/${RACK:-rack1}/g" \
