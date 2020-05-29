@@ -5,5 +5,10 @@ configMapGenerator:
   files:
   - cassandra.yaml
   - cassandra-rackdc.properties
+secretGenerator:
+- name: cassandra
+  literals:
+  - CASSANDRA_PASSWORD=secret
 resources:
 - statefulset.yaml
+- change-password.yaml
