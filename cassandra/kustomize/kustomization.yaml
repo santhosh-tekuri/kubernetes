@@ -1,0 +1,9 @@
+commonLabels:
+  app: cassandra
+configMapGenerator:
+- name: cassandra
+  files:
+  - cassandra.yaml
+  - cassandra-rackdc.properties
+resources:
+- statefulset.yaml
