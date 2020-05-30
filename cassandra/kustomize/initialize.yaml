@@ -18,7 +18,7 @@ spec:
           value: "3" # should match with StatefulSet.spec.replicas
         envFrom:
         - secretRef:
-            name: cassandra
+            name: cassandra-auth
             optional: true
         command:
         - bash

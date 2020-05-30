@@ -22,7 +22,7 @@ creates a cluster of 3 nodes
   - `START_RPC` is set to `true`
   - `RPC_ADDRESS` is set to `0.0.0.0`
 - authentication
-  - optional. enabled by secret
+  - optional. enabled by secret. see `auth` folder
   - if enabled:
     - `AUTHENTICATOR` is set to `PasswordAuthenticator`
     - `AUTHORIZER` is set to `CassandraAuthorizer`
