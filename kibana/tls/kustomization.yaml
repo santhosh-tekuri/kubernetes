@@ -4,12 +4,13 @@ generatorOptions:
   disableNameSuffixHash: true
 secretGenerator:
 - name: kibana-tls
+  type: "kubernetes.io/tls"
   files:
-  - cert
-  - key
+  - tls.crt
+  - tls.key
 configMapGenerator:
 - name: kibana-tls
   literals:
   - SERVER_SSL_ENABLED=true
-  - SERVER_SSL_CERTIFICATE=/tls/cert
-  - SERVER_SSL_KEY=/tls/key
+  - SERVER_SSL_CERTIFICATE=/tls/tls.crt
+  - SERVER_SSL_KEY=/tls/tls.key
