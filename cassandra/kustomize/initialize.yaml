@@ -10,12 +10,18 @@ spec:
       - name: config
         configMap:
           name: cassandra
+      - name: tls
+        secret:
+          secretName: cassandra-tls
+          optional: true
       containers:
       - name: init
         image: cassandra:3.11.6
         env:
         - name: REPLICAS
           value: "3" # should match with StatefulSet.spec.replicas
+        - name: SSL_CERTFILE
+          value: /cert.pem
         envFrom:
         - secretRef:
             name: cassandra-auth
@@ -24,6 +30,9 @@ spec:
         - bash
         - -ce
         - |
+          if [ -f "/cert.pem" ]; then
+              tls="--ssl"
+          fi
           for i in $(seq 0 $((REPLICAS-1))); do
               until getent hosts cassandra-$i.cassandra; do
                   echo cassandra-$i.cassandra is not yet resolvable. waiting...
@@ -31,7 +40,7 @@ spec:
               done
           done
           sleep 5
-          until cqlsh -u cassandra -p cassandra -e 'DESCRIBE keyspaces' cassandra; do
+          until cqlsh $tls -u cassandra -p cassandra -e 'DESCRIBE keyspaces' cassandra; do
               echo cassandra not yet ready. waiting...
               sleep 10
           done
@@ -42,13 +51,16 @@ spec:
           ALTER USER cassandra WITH PASSWORD '$CASSANDRA_PASSWORD';
           EOF
               echo changing password...
-              cqlsh -u cassandra -p cassandra -f /tmp/auth.sql cassandra
+              cqlsh $tls -u cassandra -p cassandra -f /tmp/auth.sql cassandra
           else
               CASSANDRA_PASSWORD=cassandra
           fi
           echo running initialize.cql...
-          cqlsh -u cassandra -p "$CASSANDRA_PASSWORD" -f /initialize.cql cassandra
+          cqlsh $tls -u cassandra -p "$CASSANDRA_PASSWORD" -f /initialize.cql cassandra
         volumeMounts:
         - name: config
           mountPath: /initialize.cql
           subPath: initialize.cql
+        - name: tls
+          mountPath: /cert.pem
+          subPath: cert.pem

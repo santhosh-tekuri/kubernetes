@@ -1,0 +1,15 @@
+commonLabels:
+  app: cassandra
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+- name: cassandra-tls
+  files:
+  - keystore
+  - truststore
+  - cert.pem
+  literals:
+  - KEYSTORE_PASSWORD=secret
+  - TRUSTSTORE_PASSWORD=secret
+  - INTERNODE_ENCRYPTION=all
+  - CLIENT_ENCRYPTION=true

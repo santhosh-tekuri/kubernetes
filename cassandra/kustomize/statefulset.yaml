@@ -44,6 +44,17 @@ spec:
       - name: config
         configMap:
           name: cassandra
+      - name: tls
+        secret:
+          secretName: cassandra-tls
+          optional: true
+          items:
+          - key: keystore
+            path: keystore
+          - key: truststore
+            path: truststore
+          - key: cert.pem
+            path: cert.pem
       containers:
       - name: cassandra
         image: cassandra:3.11.6
@@ -56,6 +67,30 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        - name: KEYSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cassandra-tls
+              key: KEYSTORE_PASSWORD
+              optional: true
+        - name: TRUSTSTORE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cassandra-tls
+              key: TRUSTSTORE_PASSWORD
+              optional: true
+        - name: INTERNODE_ENCRYPTION
+          valueFrom:
+            secretKeyRef:
+              name: cassandra-tls
+              key: INTERNODE_ENCRYPTION
+              optional: true
+        - name: CLIENT_ENCRYPTION
+          valueFrom:
+            secretKeyRef:
+              name: cassandra-tls
+              key: CLIENT_ENCRYPTION
+              optional: true
         - name: REPLICAS
           value: "3"
         - name: MAX_HEAP_SIZE
@@ -66,6 +101,8 @@ spec:
           value: "true"
         - name: RPC_ADDRESS
           value: 0.0.0.0
+        - name: SSL_CERTFILE
+          value: /etc/cassandra/cert.pem
         ports:
         - name: intra
           containerPort: 7000
@@ -80,6 +117,8 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /tmp/config
+        - name: tls
+          mountPath: /tmp/tls
         - name: data
           mountPath: /var/lib/cassandra
         command:
@@ -87,6 +126,11 @@ spec:
         - -ce
         - |
           cp /tmp/config/* /etc/cassandra
+          if [ -f /tmp/tls/keystore ]; then
+              cp /tmp/tls/keystore /etc/cassandra/.keystore
+              cp /tmp/tls/truststore /etc/cassandra/.truststore
+              cp /tmp/tls/cert.pem /etc/cassandra
+          fi
           HOST=$(hostname -s)
           DOMAIN=$(hostname -d)
           if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
@@ -116,10 +160,15 @@ spec:
                  -e "s/\${RPC_ADDRESS}/${RPC_ADDRESS:-localhost}/g" \
                  -e "s/\${AUTHENTICATOR}/${AUTHENTICATOR}/g" \
                  -e "s/\${AUTHORIZER}/${AUTHORIZER}/g" \
+                 -e "s/\${INTERNODE_ENCRYPTION}/${INTERNODE_ENCRYPTION:-none}/g" \
+                 -e "s/\${CLIENT_ENCRYPTION}/${CLIENT_ENCRYPTION:-false}/g" \
+                 -e "s/\${TRUSTSTORE_PASSWORD}/${TRUSTSTORE_PASSWORD:-cassandra}/g" \
+                 -e "s/\${KEYSTORE_PASSWORD}/${KEYSTORE_PASSWORD:-cassandra}/g" \
                  /etc/cassandra/cassandra.yaml
           sed -i -e "s/\${DATACENTER}/${DATACENTER:-dc1}/g" \
                  -e "s/\${RACK}/${RACK:-rack1}/g" \
                  /etc/cassandra/cassandra-rackdc.properties
+          cd $CASSANDRA_HOME
           exec "$@"
         - --
         args:
