@@ -1,0 +1,15 @@
+commonLabels:
+  app: kibana
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+- name: kibana-tls
+  files:
+  - cert
+  - key
+configMapGenerator:
+- name: kibana-tls
+  literals:
+  - SERVER_SSL_ENABLED=true
+  - SERVER_SSL_CERTIFICATE=/tls/cert
+  - SERVER_SSL_KEY=/tls/key

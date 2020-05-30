@@ -10,6 +10,11 @@ spec:
     spec:
       securityContext:
         fsGroup: 1000
+      volumes:
+      - name: tls
+        secret:
+          secretName: kibana-tls
+          optional: true
       containers:
       - name: kibana
         securityContext:
@@ -26,6 +31,9 @@ spec:
         - secretRef:
             name: kibana
             optional: true
+        - configMapRef:
+            name: kibana-tls
+            optional: true
         env:
         - name: ELASTICSEARCH_HOSTS
           value: http://es:9200
@@ -33,6 +41,9 @@ spec:
           value: "0.0.0.0"
         - name: NODE_OPTIONS
           value: --max-old-space-size=1800
+        volumeMounts:
+        - name: tls
+          mountPath: /tls
         readinessProbe:
           initialDelaySeconds: 10
           timeoutSeconds: 5
@@ -44,4 +55,9 @@ spec:
               if [ -n "$ELASTICSEARCH_USERNAME" ] && [ -n "$ELASTICSEARCH_PASSWORD" ]; then
                 auth="-u $ELASTICSEARCH_USERNAME:$ELASTICSEARCH_PASSWORD"
               fi
-              curl -sSfL $auth 127.0.0.1:5601/app/kibana --output /dev/null
+              if [ "$SERVER_SSL_ENABLED" = "true" ]; then
+                  protocol=https
+              else
+                  protocol=http
+              fi
+              curl -ksSfL $auth $protocol://127.0.0.1:5601/app/kibana --output /dev/null
