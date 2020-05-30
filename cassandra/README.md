@@ -15,6 +15,10 @@ creates a cluster of 3 nodes
   - `RPC_ADDRESS`: defaults to `localhost`
   - `AUTHENTICATOR`: defaults to `AllowAllAuthenticator`
   - `AUTHORIZER`: defaults to `AllowAllAuthorizer`
+  - `INTERNODE_ENCRYPTION` defaults to `none`
+  - `CLIENT_ENCRYPTION` defaults to `false`
+  - `TRUSTSTORE_PASSWORD` defaults to `cassandra`
+  - `KEYSTORE_PASSWORD` defaults to `cassandra`
 - following environment variables are replaced in `cassandra-rackdc.properties`
   - `DATACENTER`: defaults to `dc1`
   - `RACK`: defaults to `rack1`
@@ -27,6 +31,14 @@ creates a cluster of 3 nodes
     - `AUTHENTICATOR` is set to `PasswordAuthenticator`
     - `AUTHORIZER` is set to `CassandraAuthorizer`
     - job `initialize.yaml` changes the password
+- tls
+  - optional. enabled by secret. see `tls` folder
+    - `INTERNODE_ENCRYPTION` is set to `all`
+    - `CLIENT_ENCRYPTION` is set to `true`
+  - `tls/gen.sh` can be used to generate keystore and truststore
+  - `/etc/cassandra/cert.pem` used by cqlsh for cert validation
+  - env `SSL_CERTFILE` is set, for use by cqlsh
+  - pass `--ssl` to cqlsh to login
 - jvm settings
   - `MAX_HEAP_SIZE` is set to `2048M`
   - `HEAP_NEWSIZE` is set to `512M`
