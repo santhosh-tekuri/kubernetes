@@ -19,6 +19,7 @@ spec:
         envFrom:
         - secretRef:
             name: cassandra
+            optional: true
         command:
         - bash
         - -ce
@@ -34,13 +35,17 @@ spec:
               echo cassandra not yet ready. waiting...
               sleep 10
           done
-          cat << EOF > /tmp/auth.sql
-              CONSISTENCY ALL;
-              ALTER KEYSPACE system_auth WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor': $REPLICAS };
-              ALTER USER cassandra WITH PASSWORD '$CASSANDRA_PASSWORD';
+          if [ -n "$CASSANDRA_PASSWORD" ]; then
+              cat << EOF > /tmp/auth.sql
+          CONSISTENCY ALL;
+          ALTER KEYSPACE system_auth WITH REPLICATION = {'class':'SimpleStrategy', 'replication_factor': $REPLICAS };
+          ALTER USER cassandra WITH PASSWORD '$CASSANDRA_PASSWORD';
           EOF
-          echo changing password...
-          cqlsh -u cassandra -p cassandra -f /tmp/auth.sql cassandra
+              echo changing password...
+              cqlsh -u cassandra -p cassandra -f /tmp/auth.sql cassandra
+          else
+              CASSANDRA_PASSWORD=cassandra
+          fi
           echo running initialize.cql...
           cqlsh -u cassandra -p "$CASSANDRA_PASSWORD" -f /initialize.cql cassandra
         volumeMounts:

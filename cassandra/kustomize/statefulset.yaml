@@ -47,6 +47,10 @@ spec:
       containers:
       - name: cassandra
         image: cassandra:3.11.6
+        envFrom:
+        - secretRef:
+            name: cassandra
+            optional: true
         env:
         - name: POD_IP
           valueFrom:
@@ -62,10 +66,6 @@ spec:
           value: "true"
         - name: RPC_ADDRESS
           value: 0.0.0.0
-        - name: AUTHENTICATOR
-          value: PasswordAuthenticator
-        - name: AUTHORIZER
-          value: CassandraAuthorizer
         ports:
         - name: intra
           containerPort: 7000
@@ -100,6 +100,13 @@ spec:
              seeds+=($NAME-$i.$DOMAIN)
           done
           SEEDS=$(IFS=, ; echo "${seeds[*]}")
+          if [ -n "$CASSANDRA_PASSWORD" ]; then
+              AUTHENTICATOR=PasswordAuthenticator
+              AUTHORIZER=CassandraAuthorizer
+          else
+              AUTHENTICATOR=AllowAllAuthenticator
+              AUTHORIZER=AllowAllAuthorizer
+          fi
           sed -i -e "s/\${STATEFULSET_NAME}/${NAME}/g" \
                  -e "s/\${POD_IP}/${POD_IP}/g" \
                  -e "s/\${NUM_TOKENS}/${NUM_TOKENS:-256}/g" \
@@ -107,8 +114,8 @@ spec:
                  -e "s/\${ENDPOINT_SNITCH}/${ENDPOINT_SNITCH:-SimpleSnitch}/g" \
                  -e "s/\${START_RPC}/${START_RPC:-false}/g" \
                  -e "s/\${RPC_ADDRESS}/${RPC_ADDRESS:-localhost}/g" \
-                 -e "s/\${AUTHENTICATOR}/${AUTHENTICATOR:-AllowAllAuthenticator}/g" \
-                 -e "s/\${AUTHORIZER}/${AUTHORIZER:-AllowAllAuthorizer}/g" \
+                 -e "s/\${AUTHENTICATOR}/${AUTHENTICATOR}/g" \
+                 -e "s/\${AUTHORIZER}/${AUTHORIZER}/g" \
                  /etc/cassandra/cassandra.yaml
           sed -i -e "s/\${DATACENTER}/${DATACENTER:-dc1}/g" \
                  -e "s/\${RACK}/${RACK:-rack1}/g" \
