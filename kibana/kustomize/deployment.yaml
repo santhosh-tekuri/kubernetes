@@ -15,6 +15,10 @@ spec:
         secret:
           secretName: kibana-tls
           optional: true
+      - name: elasticsearch-tls
+        secret:
+          secretName: elasticsearch-tls
+          optional: true
       containers:
       - name: kibana
         securityContext:
@@ -49,9 +53,29 @@ spec:
               name: elasticsearch-auth
               key: ELASTIC_PASSWORD
               optional: true
+        - name: ELASTIC_TLS_ENABLED
+          valueFrom:
+            configMapKeyRef:
+              name: elasticsearch-tls
+              key: xpack.security.http.ssl.enabled
+              optional: true
+        args:
+        - bash
+        - -ce
+        - |
+          if [ "$ELASTIC_TLS_ENABLED" = "true" ]; then
+              export ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+              export ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/elasticsearch-tls/tls.crt
+              export ELASTICSEARCH_SSL_VERIFICATIONMODE=certificate
+          else
+              export ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+          fi
+          exec /usr/local/bin/kibana-docker
         volumeMounts:
         - name: tls
           mountPath: /tls
+        - name: elasticsearch-tls
+          mountPath: /elasticsearch-tls
         readinessProbe:
           initialDelaySeconds: 10
           timeoutSeconds: 5
