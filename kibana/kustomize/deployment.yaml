@@ -64,11 +64,9 @@ spec:
         - -ce
         - |
           if [ "$ELASTIC_TLS_ENABLED" = "true" ]; then
-              export ELASTICSEARCH_HOSTS=https://elasticsearch:9200
+              export ELASTICSEARCH_HOSTS=https${ELASTICSEARCH_HOSTS#http}
               export ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=/elasticsearch-tls/tls.crt
               export ELASTICSEARCH_SSL_VERIFICATIONMODE=certificate
-          else
-              export ELASTICSEARCH_HOSTS=http://elasticsearch:9200
           fi
           exec /usr/local/bin/kibana-docker
         volumeMounts:
