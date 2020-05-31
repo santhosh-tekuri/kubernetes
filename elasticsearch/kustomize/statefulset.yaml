@@ -69,7 +69,10 @@ spec:
           containerPort: 9300
         envFrom:
         - secretRef:
-            name: es
+            name: es-auth
+            optional: true
+        - configMapRef:
+            name: es-auth
             optional: true
         env:
         - name: node.name
@@ -84,8 +87,6 @@ spec:
           value: es-headless
         - name: ES_JAVA_OPTS
           value: -Xmx1g -Xms1g
-        - name: xpack.security.enabled
-          value: "true"
         volumeMounts:
         - name: datadir
           mountPath: /usr/share/elasticsearch/data

@@ -41,6 +41,14 @@ spec:
           value: "0.0.0.0"
         - name: NODE_OPTIONS
           value: --max-old-space-size=1800
+        - name: ELASTICSEARCH_USERNAME
+          value: elastic
+        - name: ELASTICSEARCH_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: es-auth
+              key: ELASTIC_PASSWORD
+              optional: true
         volumeMounts:
         - name: tls
           mountPath: /tls

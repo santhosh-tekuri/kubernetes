@@ -1,0 +1,12 @@
+commonLabels:
+  app: es
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+- name: es-auth
+  literals:
+  - ELASTIC_PASSWORD=secret
+configMapGenerator:
+- name: es-auth
+  literals:
+  - xpack.security.enabled=true
