@@ -1,12 +1,12 @@
 commonLabels:
-  app: es
+  app: elasticsearch
 generatorOptions:
   disableNameSuffixHash: true
 secretGenerator:
-- name: es-auth
+- name: elasticsearch-auth
   literals:
   - ELASTIC_PASSWORD=secret
 configMapGenerator:
-- name: es-auth
+- name: elasticsearch-auth
   literals:
   - xpack.security.enabled=true

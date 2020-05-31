@@ -1,5 +1,5 @@
 commonLabels:
-  app: es
+  app: elasticsearch
 resources:
 - statefulset.yaml
 - service.yaml

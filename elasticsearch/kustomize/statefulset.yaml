@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: es-headless
+  name: elasticsearch-headless
 spec:
   clusterIP: None
   publishNotReadyAddresses: true
@@ -14,16 +14,16 @@ spec:
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
 metadata:
-  name: es
+  name: elasticsearch
 spec:
   minAvailable: 2
 ---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: es
+  name: elasticsearch
 spec:
-  serviceName: es-headless
+  serviceName: elasticsearch-headless
   replicas: 3
   podManagementPolicy: Parallel
   volumeClaimTemplates:
@@ -54,7 +54,7 @@ spec:
           runAsUser: 0
           privileged: true
       containers:
-      - name: es
+      - name: elasticsearch
         image: docker.elastic.co/elasticsearch/elasticsearch:7.6.2
         securityContext:
           capabilities:
@@ -69,10 +69,10 @@ spec:
           containerPort: 9300
         envFrom:
         - secretRef:
-            name: es-auth
+            name: elasticsearch-auth
             optional: true
         - configMapRef:
-            name: es-auth
+            name: elasticsearch-auth
             optional: true
         env:
         - name: node.name
@@ -82,9 +82,9 @@ spec:
         - name: cluster.name
           value: elasticsearch
         - name: cluster.initial_master_nodes
-          value: es-0,es-1,es-2 # update based on replicas
+          value: elasticsearch-0,elasticsearch-1,elasticsearch-2 # update based on replicas
         - name: discovery.seed_hosts
-          value: es-headless
+          value: elasticsearch-headless
         - name: ES_JAVA_OPTS
           value: -Xmx1g -Xms1g
         volumeMounts:
@@ -106,7 +106,7 @@ spec:
               if [ -n "${ELASTIC_PASSWORD}" ]; then
                   auth="-u elastic:${ELASTIC_PASSWORD}"
               fi
-              start_file=/tmp/.es_start_file
+              start_file=/tmp/.elasticsearch_start_file
               if [ -f "${START_FILE}" ]; then
                   echo checking api...
                   curl -sSkf ${auth} -o /dev/null -w '%{http_code}' http://127.0.0.1:9200/
