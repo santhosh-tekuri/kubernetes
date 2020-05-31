@@ -1,0 +1,24 @@
+commonLabels:
+  app: elasticsearch
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+- name: elasticsearch-tls
+  type: "kubernetes.io/tls"
+  files:
+  - tls.crt
+  - tls.key
+configMapGenerator:
+- name: elasticsearch-tls
+  literals:
+  # --- to enable https to clients ---
+  - xpack.security.http.ssl.enabled=true
+  - xpack.security.http.ssl.key=tls/tls.key
+  - xpack.security.http.ssl.certificate=tls/tls.crt
+  - xpack.security.http.ssl.certificate_authorities=tls/tls.crt
+  # --- for tls between nodes ---
+  - xpack.security.transport.ssl.enabled=true
+  - xpack.security.transport.ssl.verification_mode=certificate
+  - xpack.security.transport.ssl.key=tls/tls.key
+  - xpack.security.transport.ssl.certificate=tls/tls.crt
+  - xpack.security.transport.ssl.certificate_authorities=tls/tls.crt
