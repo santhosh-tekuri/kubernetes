@@ -1,0 +1,10 @@
+commonLabels:
+  app: mongodb
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+- name: mongodb-auth
+  files:
+  - keyfile
+  literals:
+  - ROOT_PASSWORD=secret

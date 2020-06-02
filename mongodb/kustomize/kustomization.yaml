@@ -4,11 +4,5 @@ configMapGenerator:
 - name: mongodb
   files:
   - mongod.conf
-secretGenerator:
-- name: mongodb
-  files:
-  - keyfile
-  literals:
-  - ROOT_PASSWORD=secret
 resources:
 - statefulset.yaml
