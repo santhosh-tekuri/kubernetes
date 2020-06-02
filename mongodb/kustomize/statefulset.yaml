@@ -38,6 +38,10 @@ spec:
           name: mongodb
       - name: auth
         emptyDir: {}
+      - name: tls
+        secret:
+          secretName: mongodb-tls
+          optional: true
       containers:
       - name: mongodb
         image: mongo:4.2.6
@@ -57,13 +61,16 @@ spec:
         - bash
         - -ce
         - |
-          auth=""
           if [ -n "$keyfile" -a ! -f /etc/mongoauth/keyfile ]; then
               printenv keyfile > /etc/mongoauth/keyfile
               chmod 400 /etc/mongoauth/keyfile
               auth="--keyFile=/etc/mongoauth/keyfile"
           fi
-          exec mongod $auth "$@"
+          if [ -f /etc/mongotls/tls.key ]; then
+              cat /etc/mongotls/tls.key /etc/mongotls/tls.crt > /tmp/mongodb.pem
+              tls="--tlsMode requireTLS --tlsCertificateKeyFile /tmp/mongodb.pem"
+          fi
+          exec mongod $auth $tls "$@"
         - --
         args:
         - --config=/etc/mongod.conf
@@ -90,9 +97,13 @@ spec:
                     exit 0
                 fi
 
+                if [ -f /etc/mongotls/tls.crt ]; then
+                    tls="--tls --tlsAllowInvalidHostnames --tlsCAFile /etc/mongotls/tls.crt"
+                fi
+
                 # wait until servers are ready
                 for i in $(seq 0 $((REPLICAS-1))); do
-                    until mongo --host "$NAME-$i.$DOMAIN" --eval quit > /dev/null 2>&1; do
+                    until mongo $tls --host "$NAME-$i.$DOMAIN" --eval quit > /dev/null 2>&1; do
                         echo "$NAME-$i not ready yet. waiting..."
                         sleep 5
                     done
@@ -141,26 +152,36 @@ spec:
                     }
                 }
                 EOF
-                mongo /tmp/init.js
+                mongo $tls /tmp/init.js
         volumeMounts:
         - name: config
           mountPath: /etc/mongod.conf
           subPath: mongod.conf
         - name: auth
           mountPath: /etc/mongoauth
+        - name: tls
+          mountPath: /etc/mongotls
         - name: datadir
           mountPath: /data
         readinessProbe:
           initialDelaySeconds: 5
           exec:
             command:
-            - mongo
-            - --eval
-            - db.adminCommand('ping')
+            - bash
+            - -ce
+            - |
+              if [ -f /etc/mongotls/tls.crt ]; then
+                  tls="--tls --tlsAllowInvalidHostnames --tlsCAFile /etc/mongotls/tls.crt"
+              fi
+              mongo $tls --eval "db.adminCommand('ping')"
         livenessProbe:
           initialDelaySeconds: 5
           exec:
             command:
-            - mongo
-            - --eval
-            - db.adminCommand('ping')
+            - bash
+            - -ce
+            - |
+              if [ -f /etc/mongotls/tls.crt ]; then
+                  tls="--tls --tlsAllowInvalidHostnames --tlsCAFile /etc/mongotls/tls.crt"
+              fi
+              mongo $tls --eval "db.adminCommand('ping')"

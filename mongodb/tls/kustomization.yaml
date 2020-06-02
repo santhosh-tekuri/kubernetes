@@ -1,0 +1,10 @@
+commonLabels:
+  app: mongodb
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+- name: mongodb-tls
+  type: "kubernetes.io/tls"
+  files:
+  - tls.crt
+  - tls.key
