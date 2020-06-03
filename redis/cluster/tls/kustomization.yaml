@@ -1,0 +1,16 @@
+commonLabels:
+  app: redis
+  comp: server
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+- name: redis-tls
+  type: "kubernetes.io/tls"
+  files:
+  - tls.crt
+  - tls.key
+  - tls.dh
+configMapGenerator:
+- name: redis-tls
+  files:
+  - redis.conf

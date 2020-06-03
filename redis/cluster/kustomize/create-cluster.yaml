@@ -6,6 +6,11 @@ spec:
   template:
     spec:
       restartPolicy: Never
+      volumes:
+      - name: tls
+        secret:
+          secretName: redis-tls
+          optional: true
       containers:
       - name: redis-create-custer
         image: redis:6.0.3
@@ -26,9 +31,12 @@ spec:
           if [ "$REDIS_PASSWORD" != "" ]; then
               auth="--pass ${REDIS_PASSWORD}"
           fi
+          if [ -f /tls/tls.key ]; then
+              tls="--tls --cacert /tls/tls.crt"
+          fi
           nodes=""
           for i in $(seq 0 $((STATEFULSET_REPLICAS-1))); do
-              until timeout -s SIGKILL 5s redis-cli $auth -h redis-$i ping >/dev/null 2>&1; do
+              until timeout -s SIGKILL 5s redis-cli $tls $auth -h redis-$i ping >/dev/null 2>&1; do
                   echo redis-$i is not yet ready. waiting...
                   sleep 2
               done
@@ -36,4 +44,7 @@ spec:
               nodes="$nodes $ip:6379"
           done
           echo nodes: $nodes
-          echo yes | redis-cli $auth --cluster create $nodes --cluster-replicas $CLUSTER_REPLICAS
+          echo yes | redis-cli $tls $auth --cluster create $nodes --cluster-replicas $CLUSTER_REPLICAS
+        volumeMounts:
+        - name: tls
+          mountPath: /tls
