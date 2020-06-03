@@ -4,6 +4,7 @@ configMapGenerator:
 - name: redis-exporter
   literals:
   - REDIS_EXPORTER_LOG_FORMAT=json
+  - REDIS_EXPORTER_SKIP_TLS_VERIFICATION=true
 secretGenerator:
 - name: redis-exporter
   literals:
