@@ -39,6 +39,10 @@ spec:
         configMap:
           name: sentinel-auth
           optional: true
+      - name: redis-tls
+        secret:
+          secretName: redis-tls
+          optional: true
       containers:
       - name: sentinel
         image: redis:6.0.3
@@ -76,6 +80,10 @@ spec:
                   echo >> /tmp/sentinel.conf
                   cat /tmp/config/redis-auth.conf >> /tmp/sentinel.conf
               fi
+              if [ -f /tls/tls.key ]; then
+                  echo >> /tmp/sentinel.conf
+                  cat /tmp/config/redis-tls.conf >> /tmp/sentinel.conf
+              fi
               if [ -f /tmp/auth/sentinel.conf ]; then
                   echo >> /tmp/sentinel.conf
                   cat /tmp/auth/sentinel.conf >> /tmp/sentinel.conf
@@ -98,6 +106,8 @@ spec:
           mountPath: /tmp/config
         - name: auth
           mountPath: /tmp/auth
+        - name: redis-tls
+          mountPath: /tls
         - name: datadir
           mountPath: /data
         readinessProbe:
@@ -113,7 +123,10 @@ spec:
               if [ "$SENTINEL_PASSWORD" != "" ]; then
                   auth="--pass ${SENTINEL_PASSWORD}"
               fi
-              test "$(redis-cli -p 26379 $auth ping)" == "PONG"
+              if [ -f /tls/tls.key ]; then
+                  tls="--tls --cacert /tls/tls.crt"
+              fi
+              test "$(redis-cli -p 26379 $tls $auth ping)" == "PONG"
         livenessProbe:
           initialDelaySeconds: 5
           timeoutSeconds: 5
@@ -127,4 +140,7 @@ spec:
               if [ "$SENTINEL_PASSWORD" != "" ]; then
                   auth="--pass ${SENTINEL_PASSWORD}"
               fi
-              test "$(redis-cli -p 26379 $auth ping)" == "PONG"
+              if [ -f /tls/tls.key ]; then
+                  tls="--tls --cacert /tls/tls.crt"
+              fi
+              test "$(redis-cli -p 26379 $tls $auth ping)" == "PONG"

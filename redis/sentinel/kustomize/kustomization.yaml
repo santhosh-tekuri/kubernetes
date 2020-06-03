@@ -6,6 +6,7 @@ configMapGenerator:
   files:
   - sentinel.conf
   - redis-auth.conf
+  - redis-tls.conf
 secretGenerator:
 - name: sentinel
   literals:

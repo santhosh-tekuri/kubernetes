@@ -39,6 +39,14 @@ spec:
         configMap:
           name: redis-auth
           optional: true
+      - name: tls
+        secret:
+          secretName: redis-tls
+          optional: true
+      - name: tls-config
+        configMap:
+          name: redis-tls
+          optional: true
       containers:
       - name: redis
         image: redis:6.0.3
@@ -68,6 +76,10 @@ spec:
               if [ -f /tmp/auth/redis.conf ]; then
                   echo >> /tmp/redis.conf
                   cat /tmp/auth/redis.conf >> /tmp/redis.conf
+              fi
+              if [ -f /tmp/tls/redis.conf ]; then
+                  echo >> /tmp/redis.conf
+                  cat /tmp/tls/redis.conf >> /tmp/redis.conf
               fi
               sed -i -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
                      -e "s/\${REDIS_PASSWORD}/$REDIS_PASSWORD/g" \
@@ -104,6 +116,10 @@ spec:
           mountPath: /tmp/config
         - name: auth
           mountPath: /tmp/auth
+        - name: tls
+          mountPath: /tls
+        - name: tls-config
+          mountPath: /tmp/tls
         - name: datadir
           mountPath: /data
         readinessProbe:
@@ -119,7 +135,10 @@ spec:
               if [ "$REDIS_PASSWORD" != "" ]; then
                   auth="--pass ${REDIS_PASSWORD}"
               fi
-              test "$(redis-cli $auth ping)" == "PONG"
+              if [ -f /tls/tls.key ]; then
+                  tls="--tls --cacert /tls/tls.crt"
+              fi
+              test "$(redis-cli $tls $auth ping)" == "PONG"
         livenessProbe:
           initialDelaySeconds: 5
           timeoutSeconds: 5
@@ -133,4 +152,7 @@ spec:
               if [ "$REDIS_PASSWORD" != "" ]; then
                   auth="--pass ${REDIS_PASSWORD}"
               fi
-              test "$(redis-cli $auth ping)" == "PONG"
+              if [ -f /tls/tls.key ]; then
+                  tls="--tls --cacert /tls/tls.crt"
+              fi
+              test "$(redis-cli $tls $auth ping)" == "PONG"
