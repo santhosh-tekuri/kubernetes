@@ -1,15 +1,15 @@
 commonLabels:
   app: redis
-  comp: server
+  comp: sentinel
 configMapGenerator:
-- name: redis
+- name: sentinel
   files:
-  - redis.conf
+  - sentinel.conf
+  - redis-auth.conf
 secretGenerator:
-- name: redis
+- name: sentinel
   literals:
-  - REDIS_PASSWORD=secret
+  - SENTINEL_PASSWORD=secret
 resources:
 - service.yaml
 - statefulset.yaml
-- create-cluster.yaml

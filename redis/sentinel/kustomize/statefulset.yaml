@@ -35,6 +35,10 @@ spec:
       - name: config
         configMap:
           name: sentinel
+      - name: auth
+        configMap:
+          name: sentinel-auth
+          optional: true
       containers:
       - name: sentinel
         image: redis:6.0.3
@@ -43,7 +47,11 @@ spec:
           containerPort: 26379
         envFrom:
         - secretRef:
-            name: sentinel
+            name: sentinel-auth
+            optional: true
+        - prefix: REDIS_
+          secretRef:
+            name: redis-auth
             optional: true
         command:
         - bash
@@ -63,12 +71,21 @@ spec:
                   sleep 2
               done
               MASTER_IP=$(getent hosts redis-0.$DOMAIN | awk '{ print $1 }')
-              sed -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
-                  -e "s/\${MASTER_IP}/$MASTER_IP/g" \
-                  -e "s/\${REDIS_USER}/$REDIS_USER/g" \
-                  -e "s/\${REDIS_PASSWORD}/$REDIS_PASSWORD/g" \
-                  -e "s/\${SENTINEL_PASSWORD}/$SENTINEL_PASSWORD/g" \
-                  /configtmp/sentinel.conf > /tmp/sentinel.conf
+              cp /tmp/config/sentinel.conf /tmp/sentinel.conf
+              if [ -n "$REDIS_SENTINEL_PASSWORD" ]; then
+                  echo >> /tmp/sentinel.conf
+                  cat /tmp/config/redis-auth.conf >> /tmp/sentinel.conf
+              fi
+              if [ -f /tmp/auth/sentinel.conf ]; then
+                  echo >> /tmp/sentinel.conf
+                  cat /tmp/auth/sentinel.conf >> /tmp/sentinel.conf
+              fi
+              sed -i -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
+                     -e "s/\${MASTER_IP}/$MASTER_IP/g" \
+                     -e "s/\${REDIS_SENTINEL_USER}/$REDIS_SENTINEL_USER/g" \
+                     -e "s/\${REDIS_SENTINEL_PASSWORD}/$REDIS_SENTINEL_PASSWORD/g" \
+                     -e "s/\${SENTINEL_PASSWORD}/$SENTINEL_PASSWORD/g" \
+                     /tmp/sentinel.conf
               mv /tmp/sentinel.conf /data/sentinel.conf
           fi
           exec "$@"
@@ -78,7 +95,9 @@ spec:
         - /data/sentinel.conf
         volumeMounts:
         - name: config
-          mountPath: /configtmp
+          mountPath: /tmp/config
+        - name: auth
+          mountPath: /tmp/auth
         - name: datadir
           mountPath: /data
         readinessProbe:

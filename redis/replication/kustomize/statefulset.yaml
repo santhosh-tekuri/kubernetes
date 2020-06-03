@@ -35,6 +35,10 @@ spec:
       - name: config
         configMap:
           name: redis
+      - name: auth
+        configMap:
+          name: redis-auth
+          optional: true
       containers:
       - name: redis
         image: redis:6.0.3
@@ -45,7 +49,7 @@ spec:
           containerPort: 16379
         envFrom:
         - secretRef:
-            name: redis
+            name: redis-auth
             optional: true
         command:
         - bash
@@ -60,12 +64,16 @@ spec:
                   sleep 2
               done
               SERVICE_IP=$(getent hosts $HOST.$DOMAIN | awk '{ print $1 }')
-              mkdir -p /data/conf /data/db
-              sed -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
-                  -e "s/\${REDIS_PASSWORD}/$REDIS_PASSWORD/g" \
-                  -e "s/\${SENTINEL_USER}/$SENTINEL_USER/g" \
-                  -e "s/\${SENTINEL_PASSWORD}/$SENTINEL_PASSWORD/g" \
-                  /configtmp/redis.conf > /tmp/redis.conf
+              cp /tmp/config/redis.conf /tmp/redis.conf
+              if [ -f /tmp/auth/redis.conf ]; then
+                  echo >> /tmp/redis.conf
+                  cat /tmp/auth/redis.conf >> /tmp/redis.conf
+              fi
+              sed -i -e "s/\${SERVICE_IP}/$SERVICE_IP/g" \
+                     -e "s/\${REDIS_PASSWORD}/$REDIS_PASSWORD/g" \
+                     -e "s/\${SENTINEL_USER}/$SENTINEL_USER/g" \
+                     -e "s/\${SENTINEL_PASSWORD}/$SENTINEL_PASSWORD/g" \
+                     /tmp/redis.conf
 
               if [[ $HOST =~ (.*)-([0-9]+)$ ]]; then
                   NAME=${BASH_REMATCH[1]}
@@ -83,6 +91,7 @@ spec:
                   echo >> /tmp/redis.conf
                   echo "replicaof ${MASTER_IP} 6379" >> /tmp/redis.conf
               fi
+              mkdir -p /data/conf /data/db
               mv /tmp/redis.conf /data/conf/redis.conf
           fi
           exec "$@"
@@ -92,7 +101,9 @@ spec:
         - /data/conf/redis.conf
         volumeMounts:
         - name: config
-          mountPath: /configtmp
+          mountPath: /tmp/config
+        - name: auth
+          mountPath: /tmp/auth
         - name: datadir
           mountPath: /data
         readinessProbe:

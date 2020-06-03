@@ -1,0 +1,11 @@
+commonLabels:
+  app: redis
+  comp: server
+configMapGenerator:
+- name: redis
+  files:
+  - redis.conf
+resources:
+- service.yaml
+- statefulset.yaml
+- create-cluster.yaml

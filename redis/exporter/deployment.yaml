@@ -26,7 +26,8 @@ spec:
         - configMapRef:
             name: redis-exporter
         - secretRef:
-            name: redis-exporter
+            name: redis-auth
+            optional: true
         livenessProbe:
           httpGet:
             path: /health
