@@ -9,8 +9,6 @@ secretGenerator:
 - name: rabbitmq
   literals:
   - erlang_cookie=ZdzbbRz8jI8i0GMZBJTBvDxpSMzzNa1rVJtzfh2uUNduSoT5CAbZc61kWuWFlnFx
-  - default_user=admin
-  - default_pass=secret
 resources:
 - rbac.yaml
 - statefulset.yaml

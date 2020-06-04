@@ -1,0 +1,13 @@
+commonLabels:
+  app: rabbitmq
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+- name: rabbitmq-auth
+  literals:
+  - default_user=admin
+  - default_pass=secret
+configMapGenerator:
+- name: rabbitmq-auth
+  files:
+  - rabbitmq.conf

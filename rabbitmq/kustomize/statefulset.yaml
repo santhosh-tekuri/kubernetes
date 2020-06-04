@@ -41,6 +41,10 @@ spec:
       - name: config
         configMap:
           name: rabbitmq
+      - name: auth
+        configMap:
+          name: rabbitmq-auth
+          optional: true
       containers:
       - name: rabbitmq
         image: rabbitmq:3.8.3
@@ -59,11 +63,18 @@ spec:
         envFrom:
         - secretRef:
             name: rabbitmq
+        - secretRef:
+            name: rabbitmq-auth
+            optional: true
         command:
         - bash
         - -ce
         - |
-          cp /configtmp/* /etc/rabbitmq
+          cp /tmp/config/* /etc/rabbitmq
+          if [ -f /tmp/auth/rabbitmq.conf ]; then
+              echo >> /etc/rabbitmq/rabbitmq.conf
+              cat /tmp/auth/rabbitmq.conf >> /etc/rabbitmq/rabbitmq.conf
+          fi
           sed -i -e "s/\${default_user}/${default_user}/g" \
                  -e "s/\${default_pass}/${default_pass}/g" \
                  /etc/rabbitmq/rabbitmq.conf
@@ -78,7 +89,9 @@ spec:
         - rabbitmq-server
         volumeMounts:
         - name: config
-          mountPath: /configtmp
+          mountPath: /tmp/config
+        - name: auth
+          mountPath: /tmp/auth
         - name: datadir
           mountPath: /var/lib/rabbitmq
         readinessProbe:
