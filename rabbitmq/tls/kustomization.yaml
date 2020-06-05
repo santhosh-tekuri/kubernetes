@@ -1,0 +1,14 @@
+commonLabels:
+  app: rabbitmq
+generatorOptions:
+  disableNameSuffixHash: true
+secretGenerator:
+- name: rabbitmq-tls
+  type: "kubernetes.io/tls"
+  files:
+  - tls.crt
+  - tls.key
+configMapGenerator:
+- name: rabbitmq-tls
+  files:
+  - rabbitmq.conf

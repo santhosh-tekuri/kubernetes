@@ -9,6 +9,8 @@ spec:
     port: 4369
   - name: amqp
     port: 5672
+  - name: amqps
+    port: 5671
   - name: dist
     port: 25672
   - name: http
@@ -45,6 +47,14 @@ spec:
         configMap:
           name: rabbitmq-auth
           optional: true
+      - name: tls
+        secret:
+          secretName: rabbitmq-tls
+          optional: true
+      - name: tls-config
+        configMap:
+          name: rabbitmq-tls
+          optional: true
       containers:
       - name: rabbitmq
         image: rabbitmq:3.8.3
@@ -53,6 +63,8 @@ spec:
           containerPort: 4369
         - name: amqp
           containerPort: 5672
+        - name: amqps
+          containerPort: 5671
         - name: dist
           containerPort: 25672
         - name: http
@@ -75,6 +87,10 @@ spec:
               echo >> /etc/rabbitmq/rabbitmq.conf
               cat /tmp/auth/rabbitmq.conf >> /etc/rabbitmq/rabbitmq.conf
           fi
+          if [ -f /tmp/tls/rabbitmq.conf ]; then
+              echo >> /etc/rabbitmq/rabbitmq.conf
+              cat /tmp/tls/rabbitmq.conf >> /etc/rabbitmq/rabbitmq.conf
+          fi
           sed -i -e "s/\${default_user}/${default_user}/g" \
                  -e "s/\${default_pass}/${default_pass}/g" \
                  /etc/rabbitmq/rabbitmq.conf
@@ -92,6 +108,10 @@ spec:
           mountPath: /tmp/config
         - name: auth
           mountPath: /tmp/auth
+        - name: tls
+          mountPath: /tls
+        - name: tls-config
+          mountPath: /tmp/tls
         - name: datadir
           mountPath: /var/lib/rabbitmq
         readinessProbe:
