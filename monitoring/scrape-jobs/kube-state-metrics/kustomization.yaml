@@ -1,0 +1,16 @@
+namespace: monitoring
+commonLabels:
+  app: kube-state-metrics
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+- name: kube-state-metrics-prometheus
+  files:
+  - prometheus.yml
+  - alerting_rules.yml
+resources:
+- rbac.yaml
+- deployment.yaml
+- service.yaml
+patchesStrategicMerge:
+- patch.yaml

@@ -5,6 +5,12 @@ configMapGenerator:
 - name: blackbox-exporter
   files:
   - blackbox.yml
+configMapGenerator:
+- name: blackbox-exporter-prometheus
+  files:
+  - prometheus.yml
 resources:
 - deployment.yaml
 - service.yaml
+patchesStrategicMerge:
+- patch.yaml

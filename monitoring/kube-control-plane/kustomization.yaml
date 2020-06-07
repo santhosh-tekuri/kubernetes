@@ -1,4 +1,0 @@
-namespace: kube-system # should be deployed in kube-system
-resources:
-- kube-scheduler.yaml
-- kube-controller-manager.yaml

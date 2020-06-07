@@ -1,0 +1,9 @@
+namespace: monitoring
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+- name: kubelet-prometheus
+  files:
+  - prometheus.yml
+patchesStrategicMerge:
+- patch.yaml

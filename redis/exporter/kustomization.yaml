@@ -5,6 +5,9 @@ configMapGenerator:
   literals:
   - REDIS_EXPORTER_LOG_FORMAT=json
   - REDIS_EXPORTER_SKIP_TLS_VERIFICATION=true
+- name: redis-exporter-prometheus
+  files:
+  - prometheus.yml
 secretGenerator:
 - name: redis-exporter
   literals:
@@ -12,3 +15,5 @@ secretGenerator:
 resources:
 - deployment.yaml
 - service.yaml
+patchesStrategicMerge:
+- patch.yaml

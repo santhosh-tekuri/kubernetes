@@ -1,0 +1,11 @@
+namespace: kube-system # should be deployed in kube-system
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+- name: kube-controller-manager-prometheus
+  files:
+  - prometheus.yml
+resources:
+- service.yaml
+patchesStrategicMerge:
+- patch.yaml

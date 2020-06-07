@@ -35,13 +35,35 @@ spec:
       - name: config
         configMap:
           name: prometheus
+      - name: configdir
+        emptyDir: {}
       containers:
+      - name: configmgr
+        image: santhoshkt/promconfigmgr:1.0.0
+        args:
+        - /tmp/config/prometheus.yml
+        - /etc/prometheus/config
+        volumeMounts:
+        - name: config
+          mountPath: /tmp/config
+        - name: configdir
+          mountPath: /etc/prometheus/config
       - name: prometheus
         image: prom/prometheus:v2.18.0
         ports:
         - name: http
           containerPort: 9090
+        command:
+        - sh
+        - -ce
+        - |
+          if [ ! -f /etc/prometheus/config/prometheus.yml ]; then
+              cp /tmp/config/prometheus.yml /etc/prometheus/config
+          fi
+          exec "$@"
+        - --
         args:
+        - /bin/prometheus
         - --config.file=/etc/prometheus/config/prometheus.yml
         - --storage.tsdb.path=/data
         - --storage.tsdb.retention.time=15d
@@ -50,6 +72,8 @@ spec:
         - --web.enable-lifecycle
         volumeMounts:
         - name: config
+          mountPath: /tmp/config
+        - name: configdir
           mountPath: /etc/prometheus/config
         - name: datadir
           mountPath: /data

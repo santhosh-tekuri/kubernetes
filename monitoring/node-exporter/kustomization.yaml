@@ -1,5 +1,0 @@
-namespace: monitoring
-commonLabels:
-  app: node-exporter
-resources:
-- daemonset.yaml

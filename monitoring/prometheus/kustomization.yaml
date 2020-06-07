@@ -5,8 +5,6 @@ configMapGenerator:
 - name: prometheus
   files:
   - prometheus.yml
-  - recording_rules.yml
-  - alerting_rules.yml
 resources:
 - rbac.yaml
 - statefulset.yaml

@@ -1,0 +1,13 @@
+namespace: monitoring
+commonLabels:
+  app: node-exporter
+generatorOptions:
+  disableNameSuffixHash: true
+configMapGenerator:
+- name: node-exporter-prometheus
+  files:
+  - prometheus.yml
+resources:
+- daemonset.yaml
+patchesStrategicMerge:
+- patch.yaml
