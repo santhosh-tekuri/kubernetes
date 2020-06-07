@@ -1,9 +1,9 @@
 namespace: monitoring
 generatorOptions:
   disableNameSuffixHash: true
+commonAnnotations:
+  prometheus.io/config: "true"
 configMapGenerator:
 - name: kube-apiserver-prometheus
   files:
   - prometheus.yml
-patchesStrategicMerge:
-- patch.yaml

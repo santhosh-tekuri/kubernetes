@@ -1,9 +1,9 @@
 namespace: monitoring
 generatorOptions:
   disableNameSuffixHash: true
+commonAnnotations:
+  prometheus.io/config: "true"
 configMapGenerator:
 - name: cadvisor-prometheus
   files:
   - prometheus.yml
-patchesStrategicMerge:
-- patch.yaml
