@@ -1,11 +1,12 @@
 commonLabels:
   app: kafka
+  comp: broker
 configMapGenerator:
 - name: kafka
   files:
   - config/server.properties
   - config/log4j.properties
 resources:
-- broker.yaml
-- exporter.yaml
+- statefulset.yaml
+- service.yaml
 - create-topics.yaml

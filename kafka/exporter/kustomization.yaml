@@ -1,0 +1,5 @@
+commonLabels:
+  app: kafka
+  comp: exporter
+resources:
+- deployment.yaml
