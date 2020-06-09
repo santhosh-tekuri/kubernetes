@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch-exporter
+spec:
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9114"
+    spec:
+      volumes:
+      - name: elasticsearch-tls
+        secret:
+          secretName: elasticsearch-tls
+          optional: true
+      containers:
+      - name: elasticsearch-exporter
+        image: justwatch/elasticsearch_exporter:1.1.0
+        securityContext:
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+        ports:
+        - name: http
+          containerPort: 9114
+        env:
+        - name: ES_URI
+          value: elasticsearch:9200
+        - name: ES_ALL
+          value: "true"
+        - name: ES_SSL_SKIP_VERIFY
+          value: "true"
+        envFrom:
+        - secretRef:
+            name: elasticsearch-auth
+            optional: true
+        command:
+        - sh
+        - -ce
+        - |
+          if [ -n "$ELASTIC_PASSWORD" ]; then
+              auth="elastic:$ELASTIC_PASSWORD@"
+          fi
+          if [ -f "/tls/tls.crt" ]; then
+              export ES_URI="https://$auth$ES_URI"
+              export ES_CA=/tls/tls.crt
+          else
+              export ES_URI="http://$auth$ES_URI"
+          fi
+          exec "$@"
+        - --
+        args:
+        - /bin/elasticsearch_exporter
+        volumeMounts:
+        - name: elasticsearch-tls
+          mountPath: /tls
+        livenessProbe:
+          initialDelaySeconds: 5
+          httpGet:
+            path: /healthz
+            port: http
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http

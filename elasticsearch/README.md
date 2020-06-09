@@ -42,6 +42,19 @@ $ kubectl exec -it elasticsearch-0 -- bash
 [elasticsearch@elasticsearch-0 ~]$ exit
 ```
 
+deploy exporter:
+- `kubectl apply -k exporter`
+
+testing:
+```
+$ kubectl port-forward deployment/elasticsearch-exporter http &
+Forwarding from 127.0.0.1:9114 -> 9114
+Forwarding from [::1]:9114 -> 9114
+$ curl localhost:9114
+$ fg
+^C
+```
+
 ## notes
 
 - `initContainer` updates system configuration using `sysctl`

@@ -1,0 +1,4 @@
+commonLabels:
+  app: elasticsearch-exporter
+resources:
+- deployment.yaml
