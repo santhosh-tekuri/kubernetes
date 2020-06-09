@@ -1,0 +1,9 @@
+commonLabels:
+  app: logflow
+configMapGenerator:
+- name: logflow
+  files:
+  - logflow.conf
+resources:
+- rbac.yaml
+- daemonset.yaml

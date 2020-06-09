@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: logflow
+spec:
+  template:
+    metadata:
+      annotations:
+        logflow.io/exclude: "true"
+    spec:
+      serviceAccountName: logflow
+      tolerations:
+      - key: node-role.kubernetes.io/master
+        effect: NoSchedule
+      volumes:
+      - name: var
+        hostPath:
+          path: /var
+      - name: config
+        configMap:
+          name: logflow
+      - name: configdir
+        emptyDir: {}
+      - name: elasticsearch-tls
+        secret:
+          secretName: elasticsearch-tls
+          optional: true
+      initContainers:
+      - name: init
+        image: busybox:1.31.1
+        env:
+        - name: ES_URI
+          value: elasticsearch:9200
+        envFrom:
+        - secretRef:
+            name: elasticsearch-auth
+            optional: true
+        command:
+        - sh
+        - -ce
+        - |
+          cp /tmp/config/logflow.conf /etc/logflow/logflow.conf
+          echo >> /etc/logflow/logflow.conf
+          if [ -f "/tls/tls.crt" ]; then
+              echo "elasticsearch.url=https://$ES_URI" >> /etc/logflow/logflow.conf
+          else
+              echo "elasticsearch.url=http://$ES_URI" >> /etc/logflow/logflow.conf
+          fi
+          if [ -n "$ELASTIC_PASSWORD" ]; then
+              echo "elasticsearch.basicAuth=elastic:$ELASTIC_PASSWORD" >> /etc/logflow/logflow.conf
+          fi
+        volumeMounts:
+        - name: config
+          mountPath: /tmp/config
+        - name: configdir
+          mountPath: /etc/logflow
+        - name: elasticsearch-tls
+          mountPath: /tls
+      containers:
+      - name: logflow
+        image: santhoshkt/logflow:1.0.2
+        env:
+        - name: GODEBUG
+          value: memprofilerate=0
+        resources:
+          limits:
+            cpu: 0.1
+        volumeMounts:
+        - name: var
+          mountPath: /var
+        - name: configdir
+          mountPath: /etc/logflow
