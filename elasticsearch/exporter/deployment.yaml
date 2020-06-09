@@ -29,6 +29,18 @@ spec:
           value: elasticsearch:9200
         - name: ES_ALL
           value: "true"
+        - name: ES_CLUSTER_SETTINGS
+          value: "false"
+        - name: ES_INDICES
+          value: "false"
+        - name: ES_INDICES_SETTINGS
+          value: "false"
+        - name: ES_SHARDS
+          value: "false"
+        - name: ES_SNAPSHOTS
+          value: "false"
+        - name: ES_TIMEOUT
+          value: 30s
         - name: ES_SSL_SKIP_VERIFY
           value: "true"
         envFrom:
