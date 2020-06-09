@@ -35,6 +35,14 @@ spec:
         requests:
           storage: 8Gi
   template:
+    metadata:
+      annotations:
+        logflow.io/parser: |-
+          format=/^(?P<timestamp>\S* \S*?) \[(?P<level>[^\]]*)\] (?P<pid><[^>]*>) (?P<message>.*)$/
+          message_key=message
+          timestamp_key=timestamp
+          timestamp_layout=2006-01-02 15:04:05.999
+          multiline_start=/^\d\d\d\d-\d\d-\d\d /
     spec:
       serviceAccountName: rabbitmq
       terminationGracePeriodSeconds: 10
